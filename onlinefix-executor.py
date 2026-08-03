@@ -21,7 +21,7 @@ def download_latest_proton_ge():
             version_name = data['tag_name']
             
         # Nereye kurulacağını belirle
-        steam_compat = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
+        steam_compat = os.path.join(get_active_steam_path(), "compatibilitytools.d")
         os.makedirs(steam_compat, exist_ok=True)
         tar_path = os.path.join(steam_compat, f"{version_name}.tar.gz")
         
