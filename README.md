@@ -30,3 +30,10 @@ If you want the tool to automatically extract game icons from `.exe` files and a
 - **Arch/CachyOS:** `sudo pacman -S icoutils imagemagick`
 - **Ubuntu/Mint:** `sudo apt install icoutils imagemagick`
 - **Fedora:** `sudo dnf install icoutils ImageMagick`
+
+## Uninstallation
+
+If you ever wish to remove the tool from your system:
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/uninstall.sh)"
+```

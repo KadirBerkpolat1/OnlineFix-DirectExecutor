@@ -30,3 +30,10 @@ Eğer aracın oyun `.exe` dosyalarından ikonları otomatik çıkarıp Launcher 
 - **Arch/CachyOS:** `sudo pacman -S icoutils imagemagick`
 - **Ubuntu/Mint:** `sudo apt install icoutils imagemagick`
 - **Fedora:** `sudo dnf install icoutils ImageMagick`
+
+## Kaldırma İşlemi
+
+Aracı sisteminizden tamamen kaldırmak isterseniz:
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/uninstall.sh)"
+```

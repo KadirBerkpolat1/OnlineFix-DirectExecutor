@@ -8,6 +8,26 @@ echo "  OnlineFix Direct Executor Installation"
 echo "================================================="
 echo ""
 
+# Paket Yöneticisini Algıla ve Gerekli Paketleri Kur
+echo "[1/5] Checking and installing dependencies (icoutils, imagemagick)..."
+if ! command -v wrestool &> /dev/null || ! command -v convert &> /dev/null; then
+    echo "Dependencies are missing. Attempting to install automatically (may require sudo password)..."
+    if [ -f /etc/arch-release ]; then
+        sudo pacman -S --noconfirm --needed icoutils imagemagick
+    elif [ -f /etc/debian_version ]; then
+        sudo apt-get update && sudo apt-get install -y icoutils imagemagick
+    elif [ -f /etc/fedora-release ]; then
+        sudo dnf install -y icoutils ImageMagick
+    elif [ -f /etc/SUSE-brand ] || [ -f /etc/SuSE-release ]; then
+        sudo zypper install -y icoutils ImageMagick
+    else
+        echo "Warning: Could not auto-detect package manager. Please install 'icoutils' and 'imagemagick' manually for icon extraction to work."
+    fi
+else
+    echo "Dependencies are already installed."
+fi
+echo ""
+
 BIN_DIR="$HOME/.local/bin"
 APP_DIR="$HOME/.local/share/applications"
 ICON_DIR="$HOME/.local/share/icons/hicolor/256x256/apps"
@@ -17,16 +37,16 @@ mkdir -p "$APP_DIR"
 mkdir -p "$ICON_DIR"
 
 # 1. Download the Python script
-echo "[1/4] Downloading execution engine..."
+echo "[2/5] Downloading execution engine..."
 curl -fsSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/onlinefix-executor.py -o "$BIN_DIR/onlinefix-executor"
 chmod +x "$BIN_DIR/onlinefix-executor"
 
 # 2. Download the OnlineFix icon
-echo "[2/4] Downloading OnlineFix icon..."
+echo "[3/5] Downloading OnlineFix icon..."
 curl -fsSL https://raw.githubusercontent.com/ZzEdovec/onlinefix-linux/main/src/res/.data/img/icon.png -o "$ICON_DIR/onlinefix-logo.png"
 
 # 3. Create the .desktop file with localization
-echo "[3/4] Creating desktop integration..."
+echo "[4/5] Creating desktop integration..."
 cat <<'DESK' > "$APP_DIR/onlinefix-executor.desktop"
 [Desktop Entry]
 Name=Open with OnlineFix (Proton)
@@ -45,7 +65,7 @@ update-desktop-database "$APP_DIR" 2>/dev/null
 
 # 4. Optional: Install official OnlineFix Linux Launcher
 echo ""
-echo "[4/4] Official Launcher Integration"
+echo "[5/5] Official Launcher Integration"
 read -p "Do you want to also install the official 'onlinefix-linux' launcher? (y/N) [Default: N]: " install_launcher
 if [[ "$install_launcher" =~ ^[Yy]$ ]]; then
     echo "Downloading official installer (v2.7.1)..."
@@ -64,7 +84,3 @@ echo "  INSTALLATION COMPLETED SUCCESSFULLY!"
 echo "================================================="
 echo "You can now right-click any .exe file and select:"
 echo "-> Open with OnlineFix (Proton) / OnlineFix ile Aç"
-echo ""
-echo "Note: If you want automatic EXE icon extraction, ensure 'icoutils' and 'imagemagick' are installed on your system."
-echo "Arch: sudo pacman -S icoutils imagemagick"
-echo "Ubuntu: sudo apt install icoutils imagemagick"
