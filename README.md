@@ -1,32 +1,32 @@
 # OnlineFix Direct Executor for Linux
 
-Linux üzerinde OnlineFix oyunlarını (Proton aracılığıyla) doğrudan `.exe` dosyasına çift tıklayarak çalıştırmanızı sağlayan hafif ve evrensel bir araçtır. 
+[![tr](https://img.shields.io/badge/lang-tr-red.svg)](README.tr.md)
 
-Oyunları başlatmakla kalmaz, arka planda [OnlineFix Linux Launcher](https://github.com/ZzEdovec/onlinefix-linux) ile tam entegre çalışır. Oynadığınız oyunları Launcher'ın kütüphanesine otomatik ekler ve oynama sürenizi (Time in game) kaydeder.
+A lightweight and universal tool that allows you to run OnlineFix patched Windows games natively on Linux (via Proton) simply by double-clicking the `.exe` file.
 
-## Özellikler
+It completely bypasses the need for an intermediate GUI to launch games, but works fully integrated in the background with the official [OnlineFix Linux Launcher](https://github.com/ZzEdovec/onlinefix-linux). It automatically adds launched games to the launcher's library, tracks your play time, and extracts game icons.
 
-- **Evrensel Çalışma:** Ubuntu, Fedora, Arch Linux, Linux Mint ve diğer tüm dağıtımlarda çalışır.
-- **Flatpak & Native Steam Desteği:** Sistemdeki Steam'in Flatpak mi yoksa Native mi kurulu olduğunu otomatik algılar ve Proton'u doğru dizinlerden bulur.
-- **Otomatik Kütüphane Kaydı:** Çalıştırılan her oyunu `Games.ini` dosyasına otomatik yazar. 
-- **Oynama Süresi (Time Tracking):** Oyunda geçirdiğiniz süreyi hesaplar ve Launcher arayüzündeki oynama sürenizi günceller.
-- **Hızlı Masaüstü Entegrasyonu:** Kurulumdan sonra herhangi bir dosya yöneticisinde (Dolphin, Nautilus vb.) `.exe` dosyalarına sağ tıklayıp "OnlineFix ile Aç (Proton)" diyerek oyuna girebilirsiniz.
-- **Akıllı DLL Algılama:** Oyun klasöründeki `steamfix.ini`, `winmm.txt` gibi dosyaları okuyarak gerekli `WINEDLLOVERRIDES` ayarlarını sizin yerinize otomatik yapar.
+## Features
+- **One-Click Execution:** Right-click any `.exe` file -> "Open with OnlineFix (Proton)" to jump straight into the game.
+- **Smart DLL Overrides:** Automatically scans the game directory for `steamfix.ini`, `winmm.txt`, and necessary DLLs to inject `WINEDLLOVERRIDES`.
+- **Universal Steam Pathing:** Automatically detects and utilizes Proton from both Native Steam and Flatpak Steam installations.
+- **Library Integration:** Every game you launch is silently registered into the official launcher's `Games.ini`.
+- **Time Tracking:** Tracks your "Time in game" and syncs it with the launcher's UI.
+- **Icon Extraction:** Automatically extracts the game's icon from the `.exe` file and uses it as the banner and icon in the launcher.
+- **Bilingual Desktop Integration:** The "Open with" context menu adapts to your system language (English / Turkish) and features the official OnlineFix logo.
 
-## Kurulum
+## One-Line Installation
 
-Sisteminize kurmak için terminalde şu komutları çalıştırmanız yeterlidir:
+You can install the tool directly using `curl`:
 
 ```bash
-git clone https://github.com/KULLANICI_ADINIZ/OnlineFix-DirectExecutor.git
-cd OnlineFix-DirectExecutor
-chmod +x install_universal.sh
-./install_universal.sh
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/install.sh)"
 ```
 
-Kurulum bittikten sonra oyunlarınızın `.exe` dosyalarına sağ tıklayarak **OnlineFix ile Aç (Proton)** seçeneğini kullanabilirsiniz.
+*During the installation, you will be prompted if you optionally want to download and install the official `onlinefix-linux-launcher` GUI as well.*
 
-## Gereksinimler
-- Python 3 (Tüm Linux dağıtımlarında varsayılan olarak gelir)
-- Steam (Native veya Flatpak)
-- Herhangi bir Proton sürümü (Steam üzerinden veya GE-Proton)
+### Optional Dependencies (For Icon Extraction)
+If you want the tool to automatically extract game icons from `.exe` files and add them to the launcher's UI, please install these packages:
+- **Arch/CachyOS:** `sudo pacman -S icoutils imagemagick`
+- **Ubuntu/Mint:** `sudo apt install icoutils imagemagick`
+- **Fedora:** `sudo dnf install icoutils ImageMagick`

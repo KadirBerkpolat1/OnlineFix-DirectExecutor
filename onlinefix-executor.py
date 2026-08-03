@@ -103,6 +103,33 @@ def add_to_ofme_launcher(game_exe, game_dir, prefix_path, custom_overrides, fake
     # Dosyaya kaydet
     with open(ini_path, 'w', encoding='utf-8') as f:
         config.write(f)
+        
+    # İkon çıkartma işlemi (wrestool ve imagemagick gerektirir)
+    images_dir = os.path.expanduser("~/.config/OFME-Linux/images")
+    os.makedirs(images_dir, exist_ok=True)
+    
+    icon_path = os.path.join(images_dir, f"{game_name}_icon.png")
+    header_path = os.path.join(images_dir, f"{game_name}_header.png")
+    
+    if not os.path.exists(icon_path):
+        import subprocess
+        try:
+            # 1. EXE içinden ikonları .ico olarak çıkart
+            ico_out = os.path.join(images_dir, f"{game_name}.ico")
+            subprocess.run(["wrestool", "-x", "-t", "14", game_exe, "-o", ico_out], stderr=subprocess.DEVNULL)
+            
+            if os.path.exists(ico_out):
+                # 2. .ico dosyasını imagemagick ile .png formatına çevir (en büyük olanı al)
+                subprocess.run(["convert", f"{ico_out}[0]", icon_path], stderr=subprocess.DEVNULL)
+                os.remove(ico_out)
+                
+            # Eğer header yoksa ve ikon çıkartıldıysa, geçici olarak ikonu header olarak da kullan
+            if os.path.exists(icon_path) and not os.path.exists(header_path):
+                import shutil
+                shutil.copy2(icon_path, header_path)
+                
+        except Exception:
+            pass # Eğer araçlar kurulu değilse veya ikon yoksa sessizce geç
 
 def main():
     if len(sys.argv) < 2:
