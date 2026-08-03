@@ -1,49 +1,86 @@
-# OnlineFix Direct Executor for Linux
+<div align="center">
+  <img src="https://raw.githubusercontent.com/ZzEdovec/onlinefix-linux/main/src/.data/img/oflogo.png" alt="OnlineFix Linux Logo" width="150" />
+  <h1>OnlineFix Direct Executor</h1>
+  <p><b>Universal and Standalone Multiplayer Integration Engine for Linux</b></p>
 
-[![tr](https://img.shields.io/badge/lang-tr-red.svg)](README.tr.md)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+  [![tr](https://img.shields.io/badge/Language-Turkish-red.svg)](README.tr.md)
+  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
+  [![Platform: Linux](https://img.shields.io/badge/Platform-Linux-orange.svg)](https://kernel.org)
+  [![Environment: Steam/Proton](https://img.shields.io/badge/Environment-Proton%20%7C%20Wine-blueviolet.svg)](https://github.com/ValveSoftware/Proton)
+</div>
 
-A standalone, universal, and seamless Linux integration engine that allows you to run OnlineFix and other crack/multiplayer-modified games **by directly double-clicking the `.exe` file**.
+<br/>
 
-This tool doesn't just launch games; it dynamically configures Proton/Wine and the Steam infrastructure in the background based on the specific needs of the game. It ports the authentic OnlineFix experience from Windows to Linux losslessly, without requiring any intermediate GUI launcher.
+**OnlineFix Direct Executor** is a standalone integration tool that allows you to run games modified with OnlineFix, Empress, Goldberg, and other multiplayer cracks on Linux effortlessly—**simply by double-clicking the `.exe` file.**
 
-## 🌐 Universal Multiplayer & Server Support
+It works entirely in the background without requiring an intermediate GUI launcher. It analyzes the game configuration on the fly, applies the necessary network hooks, and dynamically prepares the Steam/Proton environment for a seamless launch.
 
-Our executor goes beyond just launching the game—it flawlessly simulates the entire server and networking backend required for modified games on Linux:
+---
 
-- **Official OnlineFix Servers & Photon Launcher:** Seamlessly connect to games utilizing the Photon (PUN) engine and official OnlineFix Dedicated servers. The required networking backend is fully supported.
-- **Steamworks & Spacewar Integration:** The tool automatically reads your configuration files to mask the `FakeAppId` (usually 480 - Spacewar) natively in the background. You can send Steam invites, create lobbies, and play with your Steam friends effortlessly.
-- **Epic Online Services (EOS):** For cross-play supported games, the engine accurately detects and hooks `eos.dll` variants, ensuring smooth Epic servers authentication.
-- **Cross-Play with Windows:** Playing on Linux via this executor does not isolate you. You can play, join, and host lobbies with your friends on Windows seamlessly within the OnlineFix infrastructure.
+## 📑 Table of Contents
+- [Features](#-features)
+- [Multiplayer & Server Support](#-multiplayer--server-support)
+- [How It Works (Under the Hood)](#-how-it-works-under-the-hood)
+- [Installation](#-installation)
+- [Uninstallation](#-uninstallation)
+- [License & Disclaimer](#-license--disclaimer)
 
-## 🚀 Key Features
+---
 
-- **One-Click Execution:** Simply right-click any `.exe` file inside your downloaded game folder and select **"Open with OnlineFix (Proton)"**. No manual prefixes or DLL setups required.
-- **Dynamic DLL Overrides:** Intelligently scans the game directory for crack files such as `steamfix.ini`, `onlinefix.ini`, `winmm.dll`, or `OnlineFix64.dll`. It then generates and injects the exact `WINEDLLOVERRIDES` the game needs to bypass DRM and enable multiplayer.
-- **Smart Proton Engine (GE-Proton):** Automatically detects installed Proton versions. If none are found, it identifies your system architecture (x86_64 or ARM64) and automatically downloads the latest *GE-Proton* directly from GitHub, installing it into Steam.
-- **Flatpak & Native Steam Support:** Whether you use Native Steam or the Flatpak version, the tool reliably resolves your library paths and handles them interchangeably.
-- **Lossless Background Interoperability:** (Optional) If you use the official *OnlineFix Linux Launcher* GUI, this tool silently registers every game you play, updates your "Time in game," and extracts high-resolution icons from the `.exe` into the launcher's `Games.ini` database.
+## ✨ Features
 
-## ⚙️ One-Line Installation
+- **🔥 One-Click Execution:** Simply right-click any `.exe` file inside your game directory and select **"Open with OnlineFix (Proton)"** to jump straight into the action.
+- **🧠 Dynamic DLL Overrides:** Intelligently detects specialized crack files (`steamfix.ini`, `onlinefix.ini`, `winmm.dll`, etc.) and instantly generates the perfect `WINEDLLOVERRIDES` configuration for Proton.
+- **⚙️ Autonomous Proton Engine (GE-Proton):** Scans your system for installed Proton versions. If none are found, it identifies your CPU architecture (x86_64 or ARM64) and automatically downloads the latest *GE-Proton* directly from GitHub.
+- **🐧 Flatpak & Native Steam Support:** Whether you use Native Steam or the Flatpak version, the engine flawlessly resolves and synchronizes your library paths.
+- **📊 Silent Background Interoperability (Optional):** If you have the official *OnlineFix Linux Launcher* installed on your system, this tool silently registers every game you play, tracks your playtime, and extracts high-resolution icons straight into the Launcher's database.
 
-To install the tool on your system, open your terminal and run:
+---
+
+## 🌐 Multiplayer & Server Support
+
+Our executor is far more than a basic "launcher." It comprehensively simulates network layers and multiplayer infrastructures:
+
+- **Official OnlineFix Servers & Photon (PUN):** Allows unobstructed connection to games relying on the Photon engine, enabling you to join official **OnlineFix Dedicated** servers natively.
+- **Steamworks & Spacewar Integration:** Silently reads `onlinefix.ini` configuration files (safely parsing UTF-8/UTF-16 encoding) to mask your network presence via `FakeAppId`. Send Steam invites, create lobbies, and play cross-platform with Windows users seamlessly.
+- **Epic Online Services (EOS):** Detects `eos.dll` hooks in cross-play supported games to ensure smooth Epic servers authentication.
+
+---
+
+## 🛠️ How It Works (Under the Hood)
+
+1. **Context Menu Execution:** When a game is launched, your Linux Desktop Environment (KDE/GNOME) passes the absolute EXE path directly to our Python engine.
+2. **Environment Analysis:** The engine scans the directory, matches known crack signatures, and extracts a dependency list.
+3. **Steam & Prefix Preparation:** An isolated WINEPREFIX (Virtual Windows C: Drive) is created for the game, linking up natively with your Flatpak or System Steam libraries.
+4. **Injection:** The discovered custom DLLs are declared as *Native* overrides, allowing the game to bypass original DRM and reroute network services.
+5. **Execution:** The correct GE-Proton version is triggered alongside the specifically crafted Environment Variables, launching the game with maximum performance.
+
+---
+
+## 📦 Installation
+
+Installation is completed using a single terminal command. Open your terminal and paste the following:
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/install.sh)"
 ```
 
-### Auto-Resolved Dependencies
-The installation script automatically detects your distribution (Arch, Fedora, Ubuntu, Debian, Suse) and securely installs the following dependencies via your package manager:
-- `zenity` or `kdialog` (For native GUI download progress and notification dialogues)
-- `icoutils` & `imagemagick` (For extracting high-quality icons from Windows executables)
+> **Note:** The installation script auto-detects your distribution (Arch, Fedora, Ubuntu, etc.) and safely installs required packages like `zenity`/`kdialog` (for GUI progress bars) and `icoutils`/`imagemagick` (for high-quality icon extraction).
+
+---
 
 ## 🗑️ Uninstallation
 
-If you wish to completely remove the tool and clean up its configurations:
+If you ever wish to completely remove the tool and its configurations, as well as clear up disk space by deleting auto-downloaded GE-Proton versions:
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/uninstall.sh)"
 ```
 
+---
+
 ## 📜 License & Disclaimer
-This project is an open-source tool provided freely under the **GPL-3.0 License** (GNU General Public License v3). This project is NOT officially affiliated with OnlineFix.me; it is a community-driven compatibility layer designed to provide interoperability on Linux.
+
+This software is a free and open-source tool distributed under the **GPL-3.0 License** (GNU General Public License v3). You are free to read, modify, and distribute the code as you see fit.
+
+*Disclaimer: This project is an independent, community-driven compatibility layer. It has no direct official affiliation with OnlineFix.me or any other release groups. It is designed solely to facilitate users' interoperability rights to run free software on their legal hardware.*

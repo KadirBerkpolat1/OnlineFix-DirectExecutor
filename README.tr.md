@@ -1,49 +1,86 @@
-# OnlineFix Direct Executor for Linux
+<div align="center">
+  <img src="https://raw.githubusercontent.com/ZzEdovec/onlinefix-linux/main/src/.data/img/oflogo.png" alt="OnlineFix Linux Logo" width="150" />
+  <h1>OnlineFix Direct Executor</h1>
+  <p><b>Linux için Evrensel ve Bağımsız Çevrimiçi Oyun Entegrasyon Motoru</b></p>
 
-[![en](https://img.shields.io/badge/lang-en-blue.svg)](README.md)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+  [![en](https://img.shields.io/badge/Language-English-blue.svg)](README.md)
+  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
+  [![Platform: Linux](https://img.shields.io/badge/Platform-Linux-orange.svg)](https://kernel.org)
+  [![Environment: Steam/Proton](https://img.shields.io/badge/Environment-Proton%20%7C%20Wine-blueviolet.svg)](https://github.com/ValveSoftware/Proton)
+</div>
 
-Linux üzerinde OnlineFix ve diğer crack/multiplayer modifikasyonlarına sahip oyunları **doğrudan `.exe` dosyasına çift tıklayarak** çalıştırmanızı sağlayan bağımsız (standalone), evrensel ve şeffaf bir Linux entegrasyon motorudur.
+<br/>
 
-Bu araç, oyunları başlatmakla kalmaz; arka planda Proton/Wine ve Steam altyapısını oyunun ihtiyaçlarına göre anlık olarak yapılandırır. Hiçbir arayüze ihtiyaç duymadan, Windows ortamındaki orijinal OnlineFix deneyimini Linux'a kayıpsız olarak taşır.
+**OnlineFix Direct Executor**, Windows için hazırlanmış olan OnlineFix, Empress, Goldberg ve diğer Crack/Multiplayer modifikasyonlarına sahip oyunları **doğrudan `.exe` dosyasına çift tıklayarak** Linux üzerinde sorunsuz bir şekilde çalıştırmanızı sağlayan bağımsız (standalone) bir entegrasyon aracıdır.
 
-## 🌐 Evrensel Çok Oyunculu (Multiplayer) Desteği
+Hiçbir arayüze ihtiyaç duymadan arka planda çalışır, oyunun yapılandırmasını anlık olarak analiz eder, gerekli ağ kancalarını (Network Hooks) atar ve Steam/Proton ortamını dinamik olarak oyun için hazırlar.
 
-Aracımız sadece oyunu başlatmakla kalmaz, aynı zamanda orijinal OnlineFix'in tüm sunucu ve bağlantı altyapılarını Linux üzerinde kusursuz bir şekilde simüle eder:
+---
 
-- **Resmi OnlineFix Sunucuları & Photon Launcher:** Oyunların kullandığı Photon (PUN) motoru ve resmi OnlineFix Dedicated sunucularına sorunsuz bağlantı kurabilirsiniz. Araç, sunucu bağlantıları için gereken ağ yapılandırmalarını (Network backend) destekler.
-- **Steamworks & Spacewar Entegrasyonu (FakeAppId):** Steam üzerinden oynanan oyunlarda arka planda otomatik olarak `FakeAppId` (örn. 480 - Spacewar) maskelemesi yapılır. Steam arkadaşlarınızla sorunsuz bir şekilde davet atabilir ve lobi kurabilirsiniz.
-- **Epic Online Services (EOS):** Çapraz platform (Cross-play) desteğine sahip oyunlarda `eos.dll` kancaları (hooks) tespit edilerek sorunsuz EOS sunucu girişi sağlanır.
-- **Windows Oyuncularıyla Çapraz Oyun (Cross-Play):** Linux üzerinden oynamanız, Windows kullanan arkadaşlarınızla aynı lobilerde (OnlineFix altyapısında) buluşmanıza kesinlikle engel değildir. Her şey %100 uyumlu çalışır.
+## 📑 İçindekiler
+- [Özellikler](#-özellikler)
+- [Çok Oyunculu ve Sunucu Desteği](#-çok-oyunculu-ve-sunucu-desteği)
+- [Nasıl Çalışır? (Kaputun Altında)](#-nasıl-çalışır-kaputun-altında)
+- [Kurulum](#-kurulum)
+- [Kaldırma İşlemi](#-kaldırma-işlemi)
+- [Lisans ve Yasal Uyarı](#-lisans-ve-yasal-uyarı)
 
-## 🚀 Temel Özellikler
+---
 
-- **Tek Tıkla Çalıştırma:** İndirdiğiniz oyun klasöründeki `.exe` dosyasına sağ tıklayın ve **"OnlineFix ile Aç (Proton)"** seçeneğini seçin. Başka hiçbir yapılandırma gerekmez.
-- **Dinamik DLL Yönlendirme (Smart Overrides):** Oyun klasöründeki `steamfix.ini`, `onlinefix.ini`, `winmm.dll`, `OnlineFix64.dll` gibi crack dosyalarını otomatik analiz eder ve oyunun ihtiyaç duyduğu `WINEDLLOVERRIDES` (DLL kancalama) parametrelerini anlık olarak oluşturur.
-- **Akıllı Proton Motoru (GE-Proton):** Sistemdeki kurulu Proton sürümlerini algılar. Eğer eksikse, sisteminizin mimarisine (x86_64 veya ARM64) en uygun, güncel *GE-Proton* sürümünü GitHub üzerinden otomatik olarak indirir ve Steam'e kurar.
-- **Flatpak & Native Steam Desteği:** Steam'i ister Flatpak üzerinden, ister Native olarak kurmuş olun; araç kütüphane yollarınızı otomatik bulur ve senkronize eder.
-- **Kayıpsız Arka Plan Uyumluluğu:** (Opsiyonel) Eğer resmi *OnlineFix Linux Launcher* arayüzünü kullanıyorsanız, oynadığınız tüm oyunları, oyun sürelerinizi (Playtime) ve otomatik çekilmiş yüksek çözünürlüklü ikonlarını Launcher'ın veritabanına (`Games.ini`) arka planda sessizce işler.
+## ✨ Özellikler
 
-## ⚙️ Tek Satırda Kurulum
+- **🔥 Tek Tıkla Çalıştırma:** İndirdiğiniz oyun klasöründeki `.exe` dosyasına sağ tıklayıp **"OnlineFix ile Aç (Proton)"** diyerek anında oyuna girin. 
+- **🧠 Dinamik DLL Yönlendirme (Smart Overrides):** Oyun klasöründeki özel crack dosyalarını (`steamfix.ini`, `onlinefix.ini`, `winmm.dll` vb.) otomatik tespit eder ve Proton için en kusursuz `WINEDLLOVERRIDES` konfigürasyonunu anlık üretir.
+- **⚙️ Otonom Proton Motoru (GE-Proton):** Sisteminizi ve Steam sürümünüzü tarar. Uygun Proton bulunamazsa, işlemci mimarinize (x86_64 veya ARM64) göre en güncel *GE-Proton* sürümünü GitHub üzerinden otomatik olarak indirip sisteme entegre eder.
+- **🐧 Flatpak & Native Steam Desteği:** Steam'i nasıl kurmuş olursanız olun (Flatpak veya sistem paketi), araç tüm kütüphane yollarını otomatik bularak senkronize olur.
+- **📊 Şeffaf Arka Plan Entegrasyonu (Opsiyonel):** Eğer sisteminizde resmi *OnlineFix Linux Launcher* kuruluysa; oynadığınız tüm oyunları, oyun sürelerinizi (Playtime) ve otomatik oluşturulan yüksek çözünürlüklü ikonlarını sessizce Launcher'ın veritabanına işler.
 
-Kurulumu gerçekleştirmek için terminalinizi açın ve aşağıdaki komutu yapıştırın:
+---
+
+## 🌐 Çok Oyunculu ve Sunucu Desteği
+
+Aracımız sadece bir "başlatıcı" değildir. Ağ katmanlarını ve çok oyunculu (multiplayer) altyapıları eksiksiz simüle eder:
+
+- **Resmi OnlineFix Sunucuları & Photon (PUN):** Oyunların ihtiyaç duyduğu Photon sunucu bağlantılarına engel olmaz; orijinal **OnlineFix Dedicated** sunucularına doğrudan katılmanıza olanak tanır.
+- **Steamworks & Spacewar Entegrasyonu:** Arka planda `onlinefix.ini` ve diğer ayar dosyalarını (UTF-8/UTF-16 fark etmeksizin) okuyarak Steam ağını maskeler (`FakeAppId`). Steam arkadaş listeniz üzerinden davet atabilir, lobi kurabilir ve Windows oyuncularıyla birlikte oynayabilirsiniz.
+- **Epic Online Services (EOS):** Çapraz platform destekli oyunlardaki Epic `eos.dll` kancalarını tespit ederek sorunsuz sunucu girişi sağlar.
+
+---
+
+## 🛠️ Nasıl Çalışır? (Kaputun Altında)
+
+1. **Bağlam Menüsü (Context Menu):** Bir oyunu açtığınızda Linux masaüstü ortamınız (KDE/GNOME vb.) argüman olarak EXE dosya yolunu doğrudan Python motorumuza iletir.
+2. **Ortam Analizi:** Motor, oyun klasörünü tarar. Çatlak (Crack) dosyalarını eşleştirerek bağımlılık listesi çıkartır.
+3. **Steam & Prefix Hazırlığı:** Oyun için izole edilmiş bir WINEPREFIX (Sanal Windows C: Sürücüsü) yaratılır ve Flatpak/Native Steam kütüphaneleri buraya bağlanır.
+4. **Enjeksiyon:** Bulunan tüm özel DLL'ler sisteme *Native* olarak tanımlanarak oyunun orijinal DRM veya ağ servislerini atlaması/yönlendirmesi sağlanır.
+5. **Yürütme (Execution):** İlgili GE-Proton sürümü, doğru ortam değişkenleriyle (Environment Variables) tetiklenir ve oyun tam performansla başlar.
+
+---
+
+## 📦 Kurulum
+
+Kurulum tek satırlık bir komut ile gerçekleştirilir. Terminalinizi açın ve aşağıdaki kodu yapıştırın:
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/install.sh)"
 ```
 
-### Otomatik Bağımlılıklar
-Kurulum betiği işletim sisteminizi (Arch, Fedora, Ubuntu, Debian, Suse) otomatik olarak tanır ve arka planda şu paketleri yükler:
-- `zenity` veya `kdialog` (Grafiksel indirme ve bildirim pencereleri için)
-- `icoutils` & `imagemagick` (Oyun dosyalarından yüksek kaliteli EXE ikonları çıkartmak için)
+> **Not:** Kurulum betiği; işletim sisteminizi otomatik algılayarak (Arch, Fedora, Ubuntu, vb.) indirme barları için `zenity`/`kdialog` ve ikon çıkartma motorları için `icoutils`, `imagemagick` gibi paketleri sisteminize güvenle kurar.
+
+---
 
 ## 🗑️ Kaldırma İşlemi
 
-Aracı ve yapılandırmalarını sistemden tamamen ve kalıntısız bir şekilde silmek isterseniz:
+Aracı ve yapılandırmalarını sistemden tamamen silmek ve arka planda indirilen geçici GE-Proton dosyalarından kurtularak yer açmak isterseniz:
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/uninstall.sh)"
 ```
 
-## 📜 Lisans & Yasal Bilgilendirme
-Bu proje açık kaynaklı bir araç olup **GPL-3.0 Lisansı** (GNU General Public License v3) ile ücretsiz olarak sunulmaktadır. Proje, OnlineFix.me ile resmi bir bağlantıya sahip değildir; yalnızca topluluk odaklı, birlikte çalışabilirlik (interoperability) sağlayan bir uyumluluk (compatibility) katmanıdır.
+---
+
+## 📜 Lisans ve Yasal Uyarı
+
+Bu yazılım **GPL-3.0 Lisansı** (GNU General Public License v3) altında dağıtılan özgür ve açık kaynaklı bir araçtır. Kodları dilediğiniz gibi okuyabilir, paylaşabilir ve geliştirebilirsiniz. 
+
+*Yasal Uyarı: Bu proje, bağımsız ve topluluk odaklı bir uyumluluk (compatibility) katmanıdır. OnlineFix.me veya başka herhangi bir grupla doğrudan resmi bir bağı yoktur. Sadece kullanıcıların yasal donanımlarında özgür yazılım çalıştırma haklarını (interoperability) kolaylaştırmak amacıyla geliştirilmiştir.*
