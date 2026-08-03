@@ -87,6 +87,17 @@ Bu yazılım **GPL-3.0 Lisansı** (GNU General Public License v3) altında dağ�
 
 ---
 
+
+## 📦 Bağımlılıklar (Dependencies)
+
+Aracı kullanmadan önce sisteminizde aşağıdaki paketlerin kurulu olduğundan emin olun:
+
+- `steam` (Zorunlu) – Oyunların Steamworks üzerinden (Spacewar) çalışabilmesi için.
+- `zenity` veya `kdialog` (Zorunlu) – İndirme pencereleri ve hata bildirimleri için.
+- `icoutils` & `imagemagick` (İsteğe Bağlı) – Oyun `.exe` dosyalarından kaliteli ikon çıkartabilmek için (`icoextract` yerine daha evrensel bir çözümdür).
+
+> **‼️ ÖNEMLİ NOT:** Orijinal *OnlineFix Linux Launcher* aksine, **bizim yazdığımız Direct Executor Flatpak Steam sürümlerini %100 destekler!** Arka plandaki akıllı tarama motorumuz, Steam'i ister yerel (Native) ister Flatpak (`com.valvesoftware.Steam`) olarak kurmuş olun kütüphane yollarınızı sorunsuz bulur. Snap desteği ise şu an için mevcut değildir.
+
 ## 🧩 Uyumluluk Tablosu (Compatibility Matrix)
 
 Farklı crack/fix türleri ve gruplar için aracımızın sunduğu destek durumu aşağıdaki gibidir:

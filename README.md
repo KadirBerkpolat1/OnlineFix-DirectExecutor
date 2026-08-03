@@ -87,6 +87,17 @@ This software is a free and open-source tool distributed under the **GPL-3.0 Lic
 
 ---
 
+
+## 📦 Dependencies
+
+Before using the executor, make sure the following packages are installed on your system:
+
+- `steam` (Required) – To run games over Steamworks network (Spacewar).
+- `zenity` or `kdialog` (Required) – For download progress bars and notifications.
+- `icoutils` & `imagemagick` (Optional) – For automatic, high-quality icon extraction from Windows `.exe` files (a more universal alternative to `icoextract`).
+
+> **‼️ IMPORTANT NOTE:** Unlike the official *OnlineFix Linux Launcher*, **our Direct Executor 100% supports Flatpak Steam versions!** Our smart engine automatically detects and adapts to your paths whether you installed Steam natively or via Flatpak (`com.valvesoftware.Steam`). However, Snap versions are currently not supported.
+
 ## 🧩 Compatibility Matrix
 
 The current support status for various fix types and release groups using our integration engine:
