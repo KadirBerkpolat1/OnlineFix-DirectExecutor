@@ -84,3 +84,20 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFi
 Bu yazılım **GPL-3.0 Lisansı** (GNU General Public License v3) altında dağıtılan özgür ve açık kaynaklı bir araçtır. Kodları dilediğiniz gibi okuyabilir, paylaşabilir ve geliştirebilirsiniz. 
 
 *Yasal Uyarı: Bu proje, bağımsız ve topluluk odaklı bir uyumluluk (compatibility) katmanıdır. OnlineFix.me veya başka herhangi bir grupla doğrudan resmi bir bağı yoktur. Sadece kullanıcıların yasal donanımlarında özgür yazılım çalıştırma haklarını (interoperability) kolaylaştırmak amacıyla geliştirilmiştir.*
+
+---
+
+## 🧩 Uyumluluk Tablosu (Compatibility Matrix)
+
+Farklı crack/fix türleri ve gruplar için aracımızın sunduğu destek durumu aşağıdaki gibidir:
+
+| Fix Türü | Grup | Durum | Notlar |
+| :--- | :--- | :--- | :--- |
+| **SteamFix** | **OnlineFix** | 🟢 Tam Destek | 64-bit oyunlarda kusursuz çalışır. Eski 32-bit oyunlarda sorun yaşanabilir. |
+| **SteamFix** | **FreeTP** | 🟡 Kısmi Destek | Sadece 2026 öncesine ait (eski) fix sürümleri desteklenmektedir. |
+| **Özel Sunucular** | **OnlineFix** | 🟢 Tam Destek | Photon Launcher altyapılı özel sunuculara (Custom Servers) tam erişim. |
+| **SteamFix + EOSFix** | **OnlineFix** | 🟢 Tam Destek | Her iki DRM'i birleştiren (Combined) oyunlarda sorunsuz giriş. |
+| **SteamFix + EOSFix** | **FreeTP** | 🔴 Desteklenmiyor | FreeTP'nin birleşik çözümlerinde çalışmamaktadır (Tamamen kırık). |
+| **EOSFix** | **OnlineFix** | 🟡 Kısmi Destek | `EOSAuthHooker` ile tam uyumludur ancak eski "Legacy" mod henüz test edilmemiştir. |
+| **EOSFix** | **FreeTP** | 🔴 Desteklenmiyor | FreeTP'nin EOS çözümleri desteklenmemektedir (Tamamen kırık). |
+

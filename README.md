@@ -84,3 +84,20 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFi
 This software is a free and open-source tool distributed under the **GPL-3.0 License** (GNU General Public License v3). You are free to read, modify, and distribute the code as you see fit.
 
 *Disclaimer: This project is an independent, community-driven compatibility layer. It has no direct official affiliation with OnlineFix.me or any other release groups. It is designed solely to facilitate users' interoperability rights to run free software on their legal hardware.*
+
+---
+
+## 🧩 Compatibility Matrix
+
+The current support status for various fix types and release groups using our integration engine:
+
+| Fix Type | Group | Status | Notes |
+| :--- | :--- | :--- | :--- |
+| **SteamFix** | **OnlineFix** | 🟢 Full Support | Seamless on 64-bit games. 32-bit games may experience issues. |
+| **SteamFix** | **FreeTP** | 🟡 Partial Support | Only supports older fixes released before 2026. |
+| **Custom Servers** | **OnlineFix** | 🟢 Full Support | Complete access to custom OnlineFix servers utilizing Photon Launcher. |
+| **SteamFix + EOSFix** | **OnlineFix** | 🟢 Full Support | Flawless execution on combined DRM solutions. |
+| **SteamFix + EOSFix** | **FreeTP** | 🔴 Broken | FreeTP's combined solutions are currently entirely broken. |
+| **EOSFix** | **OnlineFix** | 🟡 Partial Support | Fully compatible via `EOSAuthHooker`. Legacy mode remains untested. |
+| **EOSFix** | **FreeTP** | 🔴 Broken | FreeTP's EOS solutions are currently entirely broken. |
+
