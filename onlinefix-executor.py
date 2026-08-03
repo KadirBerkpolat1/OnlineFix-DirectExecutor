@@ -17,7 +17,7 @@ def download_latest_proton_ge():
         req = urllib.request.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req) as response:
             data = json.loads(response.read().decode())
-            download_url = next(asset['browser_download_url'] for asset in data['assets'] if asset['name'].endswith('.tar.gz'))
+            download_url = next(asset['browser_download_url'] for asset in data['assets'] if asset['name'].endswith('.tar.gz') and 'aarch64' not in asset['name'])
             version_name = data['tag_name']
             
         # Determine where to install
