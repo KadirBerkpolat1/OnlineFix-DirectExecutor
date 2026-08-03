@@ -196,7 +196,18 @@ def main():
 
     proton_bin = get_latest_proton()
     if not proton_bin:
-        print("Hata: Sistemde herhangi bir Proton sürümü bulunamadı.")
+        error_msg = "Sisteminizde hiçbir Proton sürümü bulunamadı!
+
+Oyunu çalıştırabilmek için lütfen Steam'den bir 'Proton' indirin veya OnlineFix Launcher arayüzünden bir 'GE-Proton' sürümü yükleyin."
+        print(error_msg)
+        import subprocess
+        
+        # Kullanıcı exe'ye çift tıkladığında hatayı görsel olarak da (Zenity veya Kdialog ile) göster
+        if subprocess.run(["which", "zenity"], stdout=subprocess.DEVNULL).returncode == 0:
+            subprocess.run(["zenity", "--error", "--text", error_msg, "--title", "OnlineFix Executor"], stderr=subprocess.DEVNULL)
+        elif subprocess.run(["which", "kdialog"], stdout=subprocess.DEVNULL).returncode == 0:
+            subprocess.run(["kdialog", "--error", error_msg, "--title", "OnlineFix Executor"], stderr=subprocess.DEVNULL)
+            
         sys.exit(1)
 
     prefix_path = os.path.join(game_dir, "OFME_Prefix")
