@@ -273,9 +273,7 @@ def main():
             proton_bin = get_latest_proton()
             
         if not proton_bin:
-            error_msg = "Otomatik Proton indirme işlemi başarısız oldu!
-
-Lütfen Steam üzerinden bir Proton sürümü indirin veya manuel olarak GE-Proton kurun."
+            error_msg = "Otomatik Proton indirme işlemi başarısız oldu!\n\nLütfen Steam üzerinden bir Proton sürümü indirin veya manuel olarak GE-Proton kurun."
             if subprocess.run(["which", "zenity"], stdout=subprocess.DEVNULL).returncode == 0:
                 subprocess.run(["zenity", "--error", "--text", error_msg, "--title", "OnlineFix Executor"], stderr=subprocess.DEVNULL)
             sys.exit(1)
