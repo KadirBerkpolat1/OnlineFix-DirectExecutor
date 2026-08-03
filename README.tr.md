@@ -1,39 +1,49 @@
-# OnlineFix Direct Executor - Linux
+# OnlineFix Direct Executor for Linux
 
 [![en](https://img.shields.io/badge/lang-en-blue.svg)](README.md)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-Linux üzerinde OnlineFix oyunlarını (Proton aracılığıyla) doğrudan `.exe` dosyasına çift tıklayarak çalıştırmanızı sağlayan hafif ve evrensel bir araçtır. 
+Linux üzerinde OnlineFix ve diğer crack/multiplayer modifikasyonlarına sahip oyunları **doğrudan `.exe` dosyasına çift tıklayarak** çalıştırmanızı sağlayan bağımsız (standalone), evrensel ve şeffaf bir Linux entegrasyon motorudur.
 
-Oyunları başlatmakla kalmaz, arka planda resmi [OnlineFix Linux Launcher](https://github.com/ZzEdovec/onlinefix-linux) ile tam entegre çalışır. Oynadığınız oyunları otomatik olarak Launcher'ın kütüphanesine ekler, oynama sürenizi kaydeder ve oyun ikonlarını çıkarır.
+Bu araç, oyunları başlatmakla kalmaz; arka planda Proton/Wine ve Steam altyapısını oyunun ihtiyaçlarına göre anlık olarak yapılandırır. Hiçbir arayüze ihtiyaç duymadan, Windows ortamındaki orijinal OnlineFix deneyimini Linux'a kayıpsız olarak taşır.
 
-## Özellikler
-- **Tek Tıkla Çalıştırma:** Herhangi bir `.exe` dosyasına sağ tıklayın -> "OnlineFix ile Aç (Proton)" diyerek direkt oyuna girin.
-- **Akıllı DLL Algılama:** Oyun klasöründeki `steamfix.ini`, `winmm.txt` gibi dosyaları okuyarak gerekli `WINEDLLOVERRIDES` ayarlarını otomatik yapar.
-- **Evrensel Steam Desteği:** Sistemdeki Steam'in Flatpak mi yoksa Native mi kurulu olduğunu otomatik algılar.
-- **Otomatik Kütüphane Kaydı:** Çalıştırılan her oyunu arayüzün `Games.ini` dosyasına otomatik yazar. 
-- **Süre Kaydı (Time Tracking):** Oyunda geçirdiğiniz süreyi (Time in game) hesaplar ve arayüzde günceller.
-- **İkon Çıkartma:** Oyunun `.exe` dosyasından resmi ikonunu otomatik çıkarır ve Launcher kütüphanesinde kapak fotoğrafı ve ikon olarak ayarlar.
-- **Çoklu Dil ve Logo Desteği:** Sağ tık menüsü sistem dilinize (İngilizce / Türkçe) göre adapte olur ve resmi OnlineFix logosunu barındırır.
+## 🌐 Evrensel Çok Oyunculu (Multiplayer) Desteği
 
-## Tek Satırda Kurulum
+Aracımız sadece oyunu başlatmakla kalmaz, aynı zamanda orijinal OnlineFix'in tüm sunucu ve bağlantı altyapılarını Linux üzerinde kusursuz bir şekilde simüle eder:
 
-Aracı doğrudan `curl` ile tek komutta sisteminize kurabilirsiniz:
+- **Resmi OnlineFix Sunucuları & Photon Launcher:** Oyunların kullandığı Photon (PUN) motoru ve resmi OnlineFix Dedicated sunucularına sorunsuz bağlantı kurabilirsiniz. Araç, sunucu bağlantıları için gereken ağ yapılandırmalarını (Network backend) destekler.
+- **Steamworks & Spacewar Entegrasyonu (FakeAppId):** Steam üzerinden oynanan oyunlarda arka planda otomatik olarak `FakeAppId` (örn. 480 - Spacewar) maskelemesi yapılır. Steam arkadaşlarınızla sorunsuz bir şekilde davet atabilir ve lobi kurabilirsiniz.
+- **Epic Online Services (EOS):** Çapraz platform (Cross-play) desteğine sahip oyunlarda `eos.dll` kancaları (hooks) tespit edilerek sorunsuz EOS sunucu girişi sağlanır.
+- **Windows Oyuncularıyla Çapraz Oyun (Cross-Play):** Linux üzerinden oynamanız, Windows kullanan arkadaşlarınızla aynı lobilerde (OnlineFix altyapısında) buluşmanıza kesinlikle engel değildir. Her şey %100 uyumlu çalışır.
+
+## 🚀 Temel Özellikler
+
+- **Tek Tıkla Çalıştırma:** İndirdiğiniz oyun klasöründeki `.exe` dosyasına sağ tıklayın ve **"OnlineFix ile Aç (Proton)"** seçeneğini seçin. Başka hiçbir yapılandırma gerekmez.
+- **Dinamik DLL Yönlendirme (Smart Overrides):** Oyun klasöründeki `steamfix.ini`, `onlinefix.ini`, `winmm.dll`, `OnlineFix64.dll` gibi crack dosyalarını otomatik analiz eder ve oyunun ihtiyaç duyduğu `WINEDLLOVERRIDES` (DLL kancalama) parametrelerini anlık olarak oluşturur.
+- **Akıllı Proton Motoru (GE-Proton):** Sistemdeki kurulu Proton sürümlerini algılar. Eğer eksikse, sisteminizin mimarisine (x86_64 veya ARM64) en uygun, güncel *GE-Proton* sürümünü GitHub üzerinden otomatik olarak indirir ve Steam'e kurar.
+- **Flatpak & Native Steam Desteği:** Steam'i ister Flatpak üzerinden, ister Native olarak kurmuş olun; araç kütüphane yollarınızı otomatik bulur ve senkronize eder.
+- **Kayıpsız Arka Plan Uyumluluğu:** (Opsiyonel) Eğer resmi *OnlineFix Linux Launcher* arayüzünü kullanıyorsanız, oynadığınız tüm oyunları, oyun sürelerinizi (Playtime) ve otomatik çekilmiş yüksek çözünürlüklü ikonlarını Launcher'ın veritabanına (`Games.ini`) arka planda sessizce işler.
+
+## ⚙️ Tek Satırda Kurulum
+
+Kurulumu gerçekleştirmek için terminalinizi açın ve aşağıdaki komutu yapıştırın:
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/install.sh)"
 ```
 
-*Kurulum sırasında, isteğe bağlı olarak resmi `onlinefix-linux-launcher` arayüzünü de otomatik kurup kurmamak istediğiniz sorulacaktır.*
+### Otomatik Bağımlılıklar
+Kurulum betiği işletim sisteminizi (Arch, Fedora, Ubuntu, Debian, Suse) otomatik olarak tanır ve arka planda şu paketleri yükler:
+- `zenity` veya `kdialog` (Grafiksel indirme ve bildirim pencereleri için)
+- `icoutils` & `imagemagick` (Oyun dosyalarından yüksek kaliteli EXE ikonları çıkartmak için)
 
-### İsteğe Bağlı Gereksinimler (İkon Çıkartma İçin)
-Eğer aracın oyun `.exe` dosyalarından ikonları otomatik çıkarıp Launcher arayüzüne eklemesini istiyorsanız sisteminizde şu paketlerin kurulu olduğundan emin olun:
-- **Arch/CachyOS:** `sudo pacman -S icoutils imagemagick`
-- **Ubuntu/Mint:** `sudo apt install icoutils imagemagick`
-- **Fedora:** `sudo dnf install icoutils ImageMagick`
+## 🗑️ Kaldırma İşlemi
 
-## Kaldırma İşlemi
+Aracı ve yapılandırmalarını sistemden tamamen ve kalıntısız bir şekilde silmek isterseniz:
 
-Aracı sisteminizden tamamen kaldırmak isterseniz:
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/uninstall.sh)"
 ```
+
+## 📜 Lisans & Yasal Bilgilendirme
+Bu proje açık kaynaklı bir araç olup **GPL-3.0 Lisansı** (GNU General Public License v3) ile ücretsiz olarak sunulmaktadır. Proje, OnlineFix.me ile resmi bir bağlantıya sahip değildir; yalnızca topluluk odaklı, birlikte çalışabilirlik (interoperability) sağlayan bir uyumluluk (compatibility) katmanıdır.
