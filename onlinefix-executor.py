@@ -64,9 +64,16 @@ def download_latest_proton_ge():
                 
             subprocess.run(["zenity", "--info", "--text", f"Download complete!\n\nExtracting {version_name} files to the system, your game will launch shortly...", "--title", "OnlineFix - Proton Installation", "--timeout", "4"], stderr=subprocess.DEVNULL)
         else:
+            has_kdialog = subprocess.run(["which", "kdialog"], stdout=subprocess.DEVNULL).returncode == 0
+            if has_kdialog:
+                subprocess.run(["kdialog", "--msgbox", f"Downloading missing Proton version:\n{version_name} (Approx. 400MB)...\n\nPlease wait, this may take a few minutes.", "--title", "OnlineFix - Proton Installation"], stderr=subprocess.DEVNULL)
+            
             # If zenity is not on the system, just use curl
             print(f"{version_name} is downloading (Approx. 400MB)...")
             subprocess.run(["curl", "-L", download_url, "-o", tar_path], check=True)
+            
+            if has_kdialog:
+                subprocess.run(["kdialog", "--msgbox", f"Download complete!\n\nExtracting {version_name} files to the system, your game will launch shortly...", "--title", "OnlineFix - Proton Installation"], stderr=subprocess.DEVNULL)
         
         print("Extracting files...")
         with tarfile.open(tar_path, "r:gz") as tar:
@@ -242,15 +249,25 @@ def main():
             continue
 
         if re.match(r'(?i)^(online|steam)fix\.ini$', f):
+            ini_content = None
             try:
-                with open(filepath, 'r', encoding='utf-8', errors='ignore') as inifile:
-                    for line in inifile:
-                        if line.strip().lower().startswith("fakeappid"):
-                            parts = line.split("=")
-                            if len(parts) > 1:
-                                fake_app_id = parts[1].strip()
-            except:
+                with open(filepath, 'r', encoding='utf-16') as inifile:
+                    ini_content = inifile.read()
+            except UnicodeError:
+                try:
+                    with open(filepath, 'r', encoding='utf-8', errors='ignore') as inifile:
+                        ini_content = inifile.read()
+                except Exception:
+                    pass
+            except Exception:
                 pass
+                
+            if ini_content:
+                for line in ini_content.splitlines():
+                    if line.strip().lower().startswith("fakeappid"):
+                        parts = line.split("=")
+                        if len(parts) > 1:
+                            fake_app_id = parts[1].strip()
             continue
 
         if re.match(r'(?i)^launch_data\.of.*$|^onlinefix\.json$', f):
@@ -281,6 +298,8 @@ def main():
             error_msg = "Auto Proton download failed!\n\nPlease download a Proton version via Steam or install GE-Proton manually."
             if subprocess.run(["which", "zenity"], stdout=subprocess.DEVNULL).returncode == 0:
                 subprocess.run(["zenity", "--error", "--text", error_msg, "--title", "OnlineFix Executor"], stderr=subprocess.DEVNULL)
+            elif subprocess.run(["which", "kdialog"], stdout=subprocess.DEVNULL).returncode == 0:
+                subprocess.run(["kdialog", "--error", error_msg, "--title", "OnlineFix Executor"], stderr=subprocess.DEVNULL)
             sys.exit(1)
 
     prefix_path = os.path.join(game_dir, "OFME_Prefix")

@@ -9,19 +9,19 @@ echo "================================================="
 echo ""
 
 # Paket Yöneticisini Algıla ve Gerekli Paketleri Kur
-echo "[1/5] Checking and installing dependencies (icoutils, imagemagick)..."
+echo "[1/5] Checking and installing dependencies (icoutils, imagemagick, zenity)..."
 if ! command -v wrestool &> /dev/null || ! command -v convert &> /dev/null; then
     echo "Dependencies are missing. Attempting to install automatically (may require sudo password)..."
     if [ -f /etc/arch-release ]; then
-        sudo pacman -S --noconfirm --needed icoutils imagemagick
+        sudo pacman -S --noconfirm --needed icoutils imagemagick zenity
     elif [ -f /etc/debian_version ]; then
-        sudo apt-get update && sudo apt-get install -y icoutils imagemagick
+        sudo apt-get update && sudo apt-get install -y icoutils imagemagick zenity
     elif [ -f /etc/fedora-release ]; then
-        sudo dnf install -y icoutils ImageMagick
+        sudo dnf install -y icoutils ImageMagick zenity
     elif [ -f /etc/SUSE-brand ] || [ -f /etc/SuSE-release ]; then
-        sudo zypper install -y icoutils ImageMagick
+        sudo zypper install -y icoutils ImageMagick zenity
     else
-        echo "Warning: Could not auto-detect package manager. Please install 'icoutils' and 'imagemagick' manually for icon extraction to work."
+        echo "Warning: Could not auto-detect package manager. Please install 'icoutils', 'imagemagick', and 'zenity' manually for icon extraction to work."
     fi
 else
     echo "Dependencies are already installed."
