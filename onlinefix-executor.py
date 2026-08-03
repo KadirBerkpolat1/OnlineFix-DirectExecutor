@@ -20,19 +20,19 @@ def download_latest_proton_ge():
             download_url = next(asset['browser_download_url'] for asset in data['assets'] if asset['name'].endswith('.tar.gz'))
             version_name = data['tag_name']
             
-        # Nereye kurulacağını belirle
+        # Determine where to install
         steam_compat = os.path.join(get_active_steam_path(), "compatibilitytools.d")
         os.makedirs(steam_compat, exist_ok=True)
         tar_path = os.path.join(steam_compat, f"{version_name}.tar.gz")
         
-        # Zenity ile Canlı İndirme Çubuğu (Progress Bar) oluştur
+        # Create a Live Download Progress Bar with Zenity
         has_zenity = subprocess.run(["which", "zenity"], stdout=subprocess.DEVNULL).returncode == 0
         
         if has_zenity:
             zenity = subprocess.Popen([
                 "zenity", "--progress", 
-                "--title", "OnlineFix - Proton Kurulumu", 
-                "--text", f"Eksik Proton sürümü indiriliyor:\n{version_name} (Yaklaşık 400MB)...", 
+                "--title", "OnlineFix - Proton Installation", 
+                "--text", f"Downloading missing Proton version:\n{version_name} (Approx. 400MB)...", 
                 "--percentage=0", "--auto-close", "--auto-kill", "--width=400"
             ], stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, universal_newlines=True)
             
@@ -48,7 +48,7 @@ def download_latest_proton_ge():
                         
             urllib.request.urlretrieve(download_url, tar_path, reporthook)
             
-            # İndirme bittiğinde progress bar'ı 100 yapıp kapat
+            # Set progress bar to 100 and close when download finishes
             try:
                 zenity.stdin.write("100\n")
                 zenity.stdin.flush()
@@ -57,28 +57,28 @@ def download_latest_proton_ge():
             except:
                 pass
                 
-            subprocess.run(["zenity", "--info", "--text", f"İndirme tamamlandı!\n\n{version_name} dosyaları sisteme çıkartılıyor, oyununuz birazdan açılacak...", "--title", "OnlineFix - Proton Kurulumu", "--timeout", "4"], stderr=subprocess.DEVNULL)
+            subprocess.run(["zenity", "--info", "--text", f"Download complete!\n\nExtracting {version_name} files to the system, your game will launch shortly...", "--title", "OnlineFix - Proton Installation", "--timeout", "4"], stderr=subprocess.DEVNULL)
         else:
-            # Sistemde zenity yoksa düz curl kullan
-            print(f"{version_name} indiriliyor (Yaklaşık 400MB)...")
+            # If zenity is not on the system, just use curl
+            print(f"{version_name} is downloading (Approx. 400MB)...")
             subprocess.run(["curl", "-L", download_url, "-o", tar_path], check=True)
         
-        print("Dosyalar çıkartılıyor...")
+        print("Extracting files...")
         with tarfile.open(tar_path, "r:gz") as tar:
             tar.extractall(path=steam_compat)
             
         os.remove(tar_path)
-        print("Proton başarıyla kuruldu!")
+        print("Proton installed successfully!")
         return True
     except Exception as e:
-        print(f"Proton otomatik indirme hatası: {e}")
+        print(f"Proton auto-download error: {e}")
         if 'tar_path' in locals() and os.path.exists(tar_path):
             os.remove(tar_path)
         return False
 
 def get_steam_paths():
     home = os.path.expanduser("~")
-    # Native ve Flatpak Steam yollarının listesi
+    # List of Native and Flatpak Steam paths
     return [
         os.path.join(home, ".local/share/Steam"),
         os.path.join(home, ".steam/steam"),
@@ -89,7 +89,7 @@ def get_steam_paths():
 def get_latest_proton():
     proton_candidates = []
 
-    # 1. OFME-Linux Proton Klasörü
+    # 1. OFME-Linux Proton Folder
     ofme_protons = os.path.expanduser("~/.config/OFME-Linux/protons")
     if os.path.isdir(ofme_protons):
         for d in os.listdir(ofme_protons):
@@ -97,7 +97,7 @@ def get_latest_proton():
             if os.path.isfile(p_bin):
                 proton_candidates.append(p_bin)
 
-    # 2. Native & Flatpak Steam Klasörleri
+    # 2. Native & Flatpak Steam Folders
     for steam_path in get_steam_paths():
         steam_compat = os.path.join(steam_path, "compatibilitytools.d")
         if os.path.isdir(steam_compat):
@@ -117,7 +117,7 @@ def get_latest_proton():
     if not proton_candidates:
         return None
 
-    # En son değiştirilme tarihine göre en güncelini seç
+    # Select the most recent one based on modification date
     return max(proton_candidates, key=os.path.getmtime)
 
 def get_active_steam_path():
@@ -141,14 +141,14 @@ def add_to_ofme_launcher(game_exe, game_dir, prefix_path, custom_overrides, fake
 
     game_name = os.path.basename(game_dir)
     if not game_name:
-        game_name = "Bilinmeyen Oyun"
+        game_name = "Unknown Game"
 
-    # Eğer aynı isimde başka bir oyun varsa ama yolları farklıysa isme numara ekle
+    # If there is another game with the same name but different paths, add a number to the name
     original_name = game_name
     counter = 1
     while config.has_section(game_name):
         if config.has_option(game_name, 'executable') and config.get(game_name, 'executable') == game_exe:
-            # Oyun zaten kayıtlı, mevcut kaydı güncelleyip çıkalım
+            # Game is already registered, update the current record and exit
             break
         game_name = f"{original_name} ({counter})"
         counter += 1
@@ -160,7 +160,7 @@ def add_to_ofme_launcher(game_exe, game_dir, prefix_path, custom_overrides, fake
     config.set(game_name, 'mainPath', game_dir)
     config.set(game_name, 'prefixPath', prefix_path)
 
-    # Proton klasörünün adını bul
+    # Find the name of the Proton folder
     proton_name = "GE-Proton Latest"
     if proton_bin_path:
         proton_name = os.path.basename(os.path.dirname(proton_bin_path))
@@ -171,11 +171,11 @@ def add_to_ofme_launcher(game_exe, game_dir, prefix_path, custom_overrides, fake
     if fake_app_id:
         config.set(game_name, 'fakeSteamID', fake_app_id)
 
-    # Dosyaya kaydet
+    # Save to file
     with open(ini_path, 'w', encoding='utf-8') as f:
         config.write(f)
         
-    # İkon çıkartma işlemi (wrestool ve imagemagick gerektirir)
+    # Icon extraction process (requires wrestool and imagemagick)
     images_dir = os.path.expanduser("~/.config/OFME-Linux/images")
     os.makedirs(images_dir, exist_ok=True)
     
@@ -185,33 +185,33 @@ def add_to_ofme_launcher(game_exe, game_dir, prefix_path, custom_overrides, fake
     if not os.path.exists(icon_path):
         import subprocess
         try:
-            # 1. EXE içinden ikonları .ico olarak çıkart
+            # 1. Extract icons from EXE as .ico
             ico_out = os.path.join(images_dir, f"{game_name}.ico")
             subprocess.run(["wrestool", "-x", "-t", "14", game_exe, "-o", ico_out], stderr=subprocess.DEVNULL)
             
             if os.path.exists(ico_out):
-                # 2. .ico dosyasını imagemagick ile .png formatına çevir (en büyük olanı al)
+                # 2. Convert .ico file to .png using imagemagick (take the largest one)
                 subprocess.run(["convert", f"{ico_out}[0]", icon_path], stderr=subprocess.DEVNULL)
                 os.remove(ico_out)
                 
-            # Eğer header yoksa ve ikon çıkartıldıysa, geçici olarak ikonu header olarak da kullan
+            # If there is no header and the icon was extracted, temporarily use the icon as the header too
             if os.path.exists(icon_path) and not os.path.exists(header_path):
                 import shutil
                 shutil.copy2(icon_path, header_path)
                 
         except Exception:
-            pass # Eğer araçlar kurulu değilse veya ikon yoksa sessizce geç
+            pass # If tools are not installed or icon is missing, fail silently
 
 def main():
     if len(sys.argv) < 2:
-        print("Kullanım: onlinefix-executor <oyun.exe>")
+        print("Usage: onlinefix-executor <oyun.exe>")
         sys.exit(1)
 
     game_exe = os.path.abspath(sys.argv[1])
     game_dir = os.path.dirname(game_exe)
 
     if not os.path.exists(game_exe):
-        print(f"Hata: Dosya bulunamadı -> {game_exe}")
+        print(f"Error: File not found -> {game_exe}")
         sys.exit(1)
 
     dx_overrides = "d3d11=n;d3d10=n;d3d10core=n;dxgi=n;openvr_api_dxvk=n;d3d12=n;d3d12core=n;d3d9=n;d3d8=n;"
@@ -267,13 +267,13 @@ def main():
 
     proton_bin = get_latest_proton()
     if not proton_bin:
-        # Görsel hata vermek yerine, direkt GE-Proton indir ve yeniden dene!
+        # Instead of visual error, directly download GE-Proton and retry!
         success = download_latest_proton_ge()
         if success:
             proton_bin = get_latest_proton()
             
         if not proton_bin:
-            error_msg = "Otomatik Proton indirme işlemi başarısız oldu!\n\nLütfen Steam üzerinden bir Proton sürümü indirin veya manuel olarak GE-Proton kurun."
+            error_msg = "Auto Proton download failed!\n\nPlease download a Proton version via Steam or install GE-Proton manually."
             if subprocess.run(["which", "zenity"], stdout=subprocess.DEVNULL).returncode == 0:
                 subprocess.run(["zenity", "--error", "--text", error_msg, "--title", "OnlineFix Executor"], stderr=subprocess.DEVNULL)
             sys.exit(1)
@@ -283,7 +283,7 @@ def main():
 
     steam_path = get_active_steam_path()
 
-    # Launcher'ın arayüzüne (Games.ini) bu oyunu entegre et
+    # Integrate this game into the Launcher's interface (Games.ini)
     add_to_ofme_launcher(game_exe, game_dir, prefix_path, custom_overrides_str, fake_app_id, proton_bin)
 
     env = os.environ.copy()
@@ -291,15 +291,15 @@ def main():
     env["STEAM_COMPAT_DATA_PATH"] = prefix_path
     env["STEAM_COMPAT_CLIENT_INSTALL_PATH"] = steam_path
 
-    # Steam arayüzü
+    # Steam overlay
     env["LD_PRELOAD"] = f"{steam_path}/ubuntu12_32/gameoverlayrenderer.so:{steam_path}/ubuntu12_64/gameoverlayrenderer.so"
     env["ENABLE_VK_LAYER_VALVE_steam_overlay_1"] = "1"
     env["SteamOverlayGameId"] = fake_app_id
 
-    # Steam'in çalışıp çalışmadığını kontrol et ve başlat (Native veya Flatpak)
+    # Check if Steam is running and start it (Native or Flatpak)
     steam_check = subprocess.run(["pidof", "steam"], stdout=subprocess.DEVNULL)
     if steam_check.returncode != 0:
-        print("Steam çalışmıyor. Arka planda başlatılıyor...")
+        print("Steam is not running. Starting in the background...")
         if "com.valvesoftware.Steam" in steam_path:
             subprocess.Popen(["flatpak", "run", "com.valvesoftware.Steam", "-silent"])
         else:
@@ -308,11 +308,11 @@ def main():
     import time
     cmd = [proton_bin, "run", game_exe]
     
-    print(f"Oyun başlatılıyor: {game_exe}")
+    print(f"Launching game: {game_exe}")
     start_time = time.time()
     
     try:
-        # Oyunu başlat ve bitmesini bekle
+        # Start the game and wait for it to finish
         process = subprocess.Popen(cmd, env=env)
         process.wait()
     except KeyboardInterrupt:
@@ -321,7 +321,7 @@ def main():
     end_time = time.time()
     elapsed_seconds = int(end_time - start_time)
     
-    # Oynanan süreyi Games.ini'ye kaydet
+    # Save the playtime to Games.ini
     if elapsed_seconds > 0:
         ini_path = os.path.expanduser("~/.config/OFME-Linux/Games.ini")
         if os.path.exists(ini_path):
@@ -330,7 +330,7 @@ def main():
             try:
                 config.read(ini_path, encoding='utf-8')
                 
-                # Oyunun adını bul (executable yolu ile eşleşen)
+                # Find the name of the game (matching executable path)
                 target_section = None
                 for section in config.sections():
                     if config.has_option(section, 'executable') and config.get(section, 'executable') == game_exe:
@@ -349,9 +349,9 @@ def main():
                     
                     with open(ini_path, 'w', encoding='utf-8') as f:
                         config.write(f)
-                    print(f"Süre güncellendi: +{elapsed_seconds} saniye.")
+                    print(f"Playtime updated: +{elapsed_seconds} seconds.")
             except Exception as e:
-                print(f"Süre kaydedilirken hata oluştu: {e}")
+                print(f"Error occurred while saving playtime: {e}")
 
 if __name__ == "__main__":
     main()

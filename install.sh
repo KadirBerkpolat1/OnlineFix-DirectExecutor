@@ -43,18 +43,16 @@ chmod +x "$BIN_DIR/onlinefix-executor"
 
 # 2. Download the OnlineFix icon
 echo "[3/5] Downloading OnlineFix icon..."
-curl -fsSL https://raw.githubusercontent.com/ZzEdovec/onlinefix-linux/main/src/res/.data/img/icon.png -o "$ICON_DIR/onlinefix-logo.png"
+curl -fsSL https://raw.githubusercontent.com/ZzEdovec/onlinefix-linux/main/src/.data/img/oflogo.png -o "$ICON_DIR/onlinefix-logo.png"
 
 # 3. Create the .desktop file with localization
 echo "[4/5] Creating desktop integration..."
-cat <<'DESK' > "$APP_DIR/onlinefix-executor.desktop"
+cat <<DESK > "$APP_DIR/onlinefix-executor.desktop"
 [Desktop Entry]
 Name=Open with OnlineFix (Proton)
-Name[tr]=OnlineFix ile Aç (Proton)
 Comment=Launch EXE files with OnlineFix patches via Proton
-Comment[tr]=Exe dosyalarını OnlineFix yamaları uygulanmış şekilde Proton ile başlatır
 Exec=sh -c '"$HOME/.local/bin/onlinefix-executor" "%f"'
-Icon=onlinefix-logo
+Icon=$ICON_DIR/onlinefix-logo.png
 Terminal=false
 Type=Application
 Categories=Game;
@@ -83,4 +81,4 @@ echo "================================================="
 echo "  INSTALLATION COMPLETED SUCCESSFULLY!"
 echo "================================================="
 echo "You can now right-click any .exe file and select:"
-echo "-> Open with OnlineFix (Proton) / OnlineFix ile Aç"
+echo "-> Open with OnlineFix (Proton)"
