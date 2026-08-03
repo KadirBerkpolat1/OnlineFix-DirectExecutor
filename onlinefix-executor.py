@@ -25,19 +25,43 @@ def download_latest_proton_ge():
         os.makedirs(steam_compat, exist_ok=True)
         tar_path = os.path.join(steam_compat, f"{version_name}.tar.gz")
         
-        # Kullanıcıya Görsel Bildirim Göster
-        msg = f"Sisteminizde Proton bulunamadı!
-
-En güncel sürüm olan {version_name} arka planda otomatik olarak indiriliyor (Yaklaşık 400 MB).
-
-İndirme internet hızınıza göre birkaç dakika sürebilir, lütfen bekleyin..."
-        if subprocess.run(["which", "zenity"], stdout=subprocess.DEVNULL).returncode == 0:
-            subprocess.Popen(["zenity", "--info", "--text", msg, "--title", "OnlineFix - Otomatik Proton Kurulumu"])
-        elif subprocess.run(["which", "kdialog"], stdout=subprocess.DEVNULL).returncode == 0:
-            subprocess.Popen(["kdialog", "--msgbox", msg, "--title", "OnlineFix - Otomatik Proton Kurulumu"])
-
-        print(f"{version_name} indiriliyor...")
-        subprocess.run(["curl", "-L", download_url, "-o", tar_path], check=True)
+        # Zenity ile Canlı İndirme Çubuğu (Progress Bar) oluştur
+        has_zenity = subprocess.run(["which", "zenity"], stdout=subprocess.DEVNULL).returncode == 0
+        
+        if has_zenity:
+            zenity = subprocess.Popen([
+                "zenity", "--progress", 
+                "--title", "OnlineFix - Proton Kurulumu", 
+                "--text", f"Eksik Proton sürümü indiriliyor:\n{version_name} (Yaklaşık 400MB)...", 
+                "--percentage=0", "--auto-close", "--auto-kill", "--width=400"
+            ], stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, universal_newlines=True)
+            
+            def reporthook(block_num, block_size, total_size):
+                if total_size > 0:
+                    percent = int(block_num * block_size * 100 / total_size)
+                    if percent > 100: percent = 100
+                    try:
+                        zenity.stdin.write(f"{percent}\n")
+                        zenity.stdin.flush()
+                    except:
+                        pass
+                        
+            urllib.request.urlretrieve(download_url, tar_path, reporthook)
+            
+            # İndirme bittiğinde progress bar'ı 100 yapıp kapat
+            try:
+                zenity.stdin.write("100\n")
+                zenity.stdin.flush()
+                zenity.stdin.close()
+                zenity.wait()
+            except:
+                pass
+                
+            subprocess.run(["zenity", "--info", "--text", f"İndirme tamamlandı!\n\n{version_name} dosyaları sisteme çıkartılıyor, oyununuz birazdan açılacak...", "--title", "OnlineFix - Proton Kurulumu", "--timeout", "4"], stderr=subprocess.DEVNULL)
+        else:
+            # Sistemde zenity yoksa düz curl kullan
+            print(f"{version_name} indiriliyor (Yaklaşık 400MB)...")
+            subprocess.run(["curl", "-L", download_url, "-o", tar_path], check=True)
         
         print("Dosyalar çıkartılıyor...")
         with tarfile.open(tar_path, "r:gz") as tar:
@@ -48,6 +72,8 @@ En güncel sürüm olan {version_name} arka planda otomatik olarak indiriliyor (
         return True
     except Exception as e:
         print(f"Proton otomatik indirme hatası: {e}")
+        if 'tar_path' in locals() and os.path.exists(tar_path):
+            os.remove(tar_path)
         return False
 
 def get_steam_paths():
