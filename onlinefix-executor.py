@@ -5,6 +5,51 @@ import re
 import subprocess
 import configparser
 
+
+import urllib.request
+import json
+import tarfile
+
+def download_latest_proton_ge():
+    try:
+        # En güncel GE-Proton sürümünü GitHub API'sinden çek
+        api_url = "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest"
+        req = urllib.request.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req) as response:
+            data = json.loads(response.read().decode())
+            download_url = next(asset['browser_download_url'] for asset in data['assets'] if asset['name'].endswith('.tar.gz'))
+            version_name = data['tag_name']
+            
+        # Nereye kurulacağını belirle
+        steam_compat = os.path.expanduser("~/.local/share/Steam/compatibilitytools.d")
+        os.makedirs(steam_compat, exist_ok=True)
+        tar_path = os.path.join(steam_compat, f"{version_name}.tar.gz")
+        
+        # Kullanıcıya Görsel Bildirim Göster
+        msg = f"Sisteminizde Proton bulunamadı!
+
+En güncel sürüm olan {version_name} arka planda otomatik olarak indiriliyor (Yaklaşık 400 MB).
+
+İndirme internet hızınıza göre birkaç dakika sürebilir, lütfen bekleyin..."
+        if subprocess.run(["which", "zenity"], stdout=subprocess.DEVNULL).returncode == 0:
+            subprocess.Popen(["zenity", "--info", "--text", msg, "--title", "OnlineFix - Otomatik Proton Kurulumu"])
+        elif subprocess.run(["which", "kdialog"], stdout=subprocess.DEVNULL).returncode == 0:
+            subprocess.Popen(["kdialog", "--msgbox", msg, "--title", "OnlineFix - Otomatik Proton Kurulumu"])
+
+        print(f"{version_name} indiriliyor...")
+        subprocess.run(["curl", "-L", download_url, "-o", tar_path], check=True)
+        
+        print("Dosyalar çıkartılıyor...")
+        with tarfile.open(tar_path, "r:gz") as tar:
+            tar.extractall(path=steam_compat)
+            
+        os.remove(tar_path)
+        print("Proton başarıyla kuruldu!")
+        return True
+    except Exception as e:
+        print(f"Proton otomatik indirme hatası: {e}")
+        return False
+
 def get_steam_paths():
     home = os.path.expanduser("~")
     # Native ve Flatpak Steam yollarının listesi
@@ -196,19 +241,18 @@ def main():
 
     proton_bin = get_latest_proton()
     if not proton_bin:
-        error_msg = "Sisteminizde hiçbir Proton sürümü bulunamadı!
-
-Oyunu çalıştırabilmek için lütfen Steam'den bir 'Proton' indirin veya OnlineFix Launcher arayüzünden bir 'GE-Proton' sürümü yükleyin."
-        print(error_msg)
-        import subprocess
-        
-        # Kullanıcı exe'ye çift tıkladığında hatayı görsel olarak da (Zenity veya Kdialog ile) göster
-        if subprocess.run(["which", "zenity"], stdout=subprocess.DEVNULL).returncode == 0:
-            subprocess.run(["zenity", "--error", "--text", error_msg, "--title", "OnlineFix Executor"], stderr=subprocess.DEVNULL)
-        elif subprocess.run(["which", "kdialog"], stdout=subprocess.DEVNULL).returncode == 0:
-            subprocess.run(["kdialog", "--error", error_msg, "--title", "OnlineFix Executor"], stderr=subprocess.DEVNULL)
+        # Görsel hata vermek yerine, direkt GE-Proton indir ve yeniden dene!
+        success = download_latest_proton_ge()
+        if success:
+            proton_bin = get_latest_proton()
             
-        sys.exit(1)
+        if not proton_bin:
+            error_msg = "Otomatik Proton indirme işlemi başarısız oldu!
+
+Lütfen Steam üzerinden bir Proton sürümü indirin veya manuel olarak GE-Proton kurun."
+            if subprocess.run(["which", "zenity"], stdout=subprocess.DEVNULL).returncode == 0:
+                subprocess.run(["zenity", "--error", "--text", error_msg, "--title", "OnlineFix Executor"], stderr=subprocess.DEVNULL)
+            sys.exit(1)
 
     prefix_path = os.path.join(game_dir, "OFME_Prefix")
     os.makedirs(prefix_path, exist_ok=True)
