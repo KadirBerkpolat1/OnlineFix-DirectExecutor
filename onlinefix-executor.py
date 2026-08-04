@@ -4,11 +4,29 @@ import sys
 import re
 import subprocess
 import configparser
-
-
 import urllib.request
 import json
 import tarfile
+import time
+
+def load_game_config(game_dir):
+    config_path = os.path.join(game_dir, ".ofme-config.json")
+    default_config = {
+        "proton_version": "auto",
+        "use_gamemode": False,
+        "use_mangohud": False,
+        "use_gamescope": False,
+        "gamescope_args": "-W 1920 -H 1080",
+        "injected_dlls": []  # Example: ["trainer.dll", "cheat.dll"]
+    }
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r') as f:
+                data = json.load(f)
+                default_config.update(data)
+        except Exception:
+            pass
+    return default_config
 
 def download_latest_proton_ge():
     try:
@@ -24,23 +42,23 @@ def download_latest_proton_ge():
             else:
                 download_url = next(asset['browser_download_url'] for asset in data['assets'] if asset['name'].endswith('.tar.gz') and 'aarch64' not in asset['name'])
             version_name = data['tag_name']
-            
+
         # Determine where to install
         steam_compat = os.path.join(get_active_steam_path(), "compatibilitytools.d")
         os.makedirs(steam_compat, exist_ok=True)
         tar_path = os.path.join(steam_compat, f"{version_name}.tar.gz")
-        
+
         # Create a Live Download Progress Bar with Zenity
         has_zenity = subprocess.run(["which", "zenity"], stdout=subprocess.DEVNULL).returncode == 0
-        
+
         if has_zenity:
             zenity = subprocess.Popen([
-                "zenity", "--progress", 
-                "--title", "OnlineFix - Proton Installation", 
-                "--text", f"Downloading missing Proton version:\n{version_name} (Approx. 400MB)...", 
+                "zenity", "--progress",
+                "--title", "OnlineFix - Proton Installation",
+                "--text", f"Downloading missing Proton version:\n{version_name} (Approx. 400MB)...",
                 "--percentage=0", "--auto-close", "--auto-kill", "--width=400"
             ], stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, universal_newlines=True)
-            
+
             def reporthook(block_num, block_size, total_size):
                 if total_size > 0:
                     percent = int(block_num * block_size * 100 / total_size)
@@ -50,9 +68,9 @@ def download_latest_proton_ge():
                         zenity.stdin.flush()
                     except:
                         pass
-                        
+
             urllib.request.urlretrieve(download_url, tar_path, reporthook)
-            
+
             # Set progress bar to 100 and close when download finishes
             try:
                 zenity.stdin.write("100\n")
@@ -61,24 +79,24 @@ def download_latest_proton_ge():
                 zenity.wait()
             except:
                 pass
-                
+
             subprocess.run(["zenity", "--info", "--text", f"Download complete!\n\nExtracting {version_name} files to the system, your game will launch shortly...", "--title", "OnlineFix - Proton Installation", "--timeout", "4"], stderr=subprocess.DEVNULL)
         else:
             has_kdialog = subprocess.run(["which", "kdialog"], stdout=subprocess.DEVNULL).returncode == 0
             if has_kdialog:
                 subprocess.run(["kdialog", "--msgbox", f"Downloading missing Proton version:\n{version_name} (Approx. 400MB)...\n\nPlease wait, this may take a few minutes.", "--title", "OnlineFix - Proton Installation"], stderr=subprocess.DEVNULL)
-            
+
             # If zenity is not on the system, just use curl
             print(f"{version_name} is downloading (Approx. 400MB)...")
             subprocess.run(["curl", "-L", download_url, "-o", tar_path], check=True)
-            
+
             if has_kdialog:
                 subprocess.run(["kdialog", "--msgbox", f"Download complete!\n\nExtracting {version_name} files to the system, your game will launch shortly...", "--title", "OnlineFix - Proton Installation"], stderr=subprocess.DEVNULL)
-        
+
         print("Extracting files...")
         with tarfile.open(tar_path, "r:gz") as tar:
             tar.extractall(path=steam_compat)
-            
+
         os.remove(tar_path)
         print("Proton installed successfully!")
         return True
@@ -98,7 +116,7 @@ def get_steam_paths():
         os.path.join(home, ".var/app/com.valvesoftware.Steam/.local/share/Steam")
     ]
 
-def get_latest_proton():
+def get_latest_proton(preferred_name=None):
     proton_candidates = []
 
     # 1. OFME-Linux Proton Folder
@@ -128,6 +146,11 @@ def get_latest_proton():
 
     if not proton_candidates:
         return None
+
+    if preferred_name and preferred_name != "auto":
+        for p in proton_candidates:
+            if preferred_name.lower() in p.lower():
+                return p
 
     # Select the most recent one based on modification date
     return max(proton_candidates, key=os.path.getmtime)
@@ -216,11 +239,11 @@ def add_to_ofme_launcher(game_exe, game_dir, prefix_path, custom_overrides, fake
     # Save to file
     with open(ini_path, 'w', encoding='utf-8') as f:
         config.write(f)
-        
+
     # Icon extraction process (requires wrestool and imagemagick)
     images_dir = os.path.expanduser("~/.config/OFME-Linux/images")
     os.makedirs(images_dir, exist_ok=True)
-    
+
     icon_path = os.path.join(images_dir, f"{game_name}_icon.png")
     header_path = os.path.join(images_dir, f"{game_name}_header.png")
 
@@ -241,17 +264,17 @@ def add_to_ofme_launcher(game_exe, game_dir, prefix_path, custom_overrides, fake
             # 1. Extract icons from EXE as .ico
             ico_out = os.path.join(images_dir, f"{game_name}.ico")
             subprocess.run(["wrestool", "-x", "-t", "14", game_exe, "-o", ico_out], stderr=subprocess.DEVNULL)
-            
+
             if os.path.exists(ico_out):
                 # 2. Convert .ico file to .png using imagemagick (take the largest one)
                 subprocess.run(["convert", f"{ico_out}[0]", icon_path], stderr=subprocess.DEVNULL)
                 os.remove(ico_out)
-                
+
             # If there is no header and the icon was extracted, temporarily use the icon as the header too
             if os.path.exists(icon_path) and not os.path.exists(header_path):
                 import shutil
                 shutil.copy2(icon_path, header_path)
-                
+
         except Exception:
             pass # If tools are not installed or icon is missing, fail silently
 
@@ -266,6 +289,8 @@ def main():
     if not os.path.exists(game_exe):
         print(f"Error: File not found -> {game_exe}")
         sys.exit(1)
+
+    game_cfg = load_game_config(game_dir)
 
     dx_overrides = "d3d11=n;d3d10=n;d3d10core=n;dxgi=n;openvr_api_dxvk=n;d3d12=n;d3d12core=n;d3d9=n;d3d8=n;winedbg.exe=d;"
     overrides = []
@@ -302,7 +327,7 @@ def main():
                     pass
             except Exception:
                 pass
-                
+
             if ini_content:
                 for line in ini_content.splitlines():
                     if line.strip().lower().startswith("fakeappid"):
@@ -322,25 +347,30 @@ def main():
                 else:
                     overrides.append(f"{dll_name}=n")
 
+    # Add dynamically injected DLLs from config (Trainers, Cheats)
+    for inj_dll in game_cfg["injected_dlls"]:
+        if inj_dll.lower().endswith('.dll'):
+            dll_name = os.path.splitext(os.path.basename(inj_dll))[0].lower()
+            if dll_name not in [o.split('=')[0] for o in overrides]:
+                overrides.append(f"{dll_name}=n,b")
+
     custom_overrides_str = ";".join(overrides)
     if custom_overrides_str:
         custom_overrides_str += ";"
 
     final_overrides = dx_overrides + custom_overrides_str
 
-    proton_bin = get_latest_proton()
+    proton_bin = get_latest_proton(preferred_name=game_cfg["proton_version"])
     if not proton_bin:
         # Instead of visual error, directly download GE-Proton and retry!
         success = download_latest_proton_ge()
         if success:
             proton_bin = get_latest_proton()
-            
+
         if not proton_bin:
             error_msg = "Auto Proton download failed!\n\nPlease download a Proton version via Steam or install GE-Proton manually."
             if subprocess.run(["which", "zenity"], stdout=subprocess.DEVNULL).returncode == 0:
                 subprocess.run(["zenity", "--error", "--text", error_msg, "--title", "OnlineFix Executor"], stderr=subprocess.DEVNULL)
-            elif subprocess.run(["which", "kdialog"], stdout=subprocess.DEVNULL).returncode == 0:
-                subprocess.run(["kdialog", "--error", error_msg, "--title", "OnlineFix Executor"], stderr=subprocess.DEVNULL)
             sys.exit(1)
 
     prefix_path = os.path.join(game_dir, "OFME_Prefix")
@@ -357,6 +387,9 @@ def main():
     env["STEAM_COMPAT_DATA_PATH"] = prefix_path
     env["STEAM_COMPAT_CLIENT_INSTALL_PATH"] = steam_path
 
+    if game_cfg["use_mangohud"]:
+        env["MANGOHUD"] = "1"
+
     # Steam overlay
     env["LD_PRELOAD"] = f"{steam_path}/ubuntu12_32/gameoverlayrenderer.so:{steam_path}/ubuntu12_64/gameoverlayrenderer.so"
     env["ENABLE_VK_LAYER_VALVE_steam_overlay_1"] = "1"
@@ -371,22 +404,43 @@ def main():
         else:
             subprocess.Popen(["steam", "-silent"])
 
-    import time
+    # Build the execution command
     cmd = [proton_bin, "run", game_exe]
-    
+
+    if game_cfg["use_gamemode"]:
+        cmd = ["gamemoderun"] + cmd
+
+    if game_cfg["use_gamescope"]:
+        cmd = ["gamescope"] + game_cfg["gamescope_args"].split() + ["--"] + cmd
+
     print(f"Launching game: {game_exe}")
     start_time = time.time()
-    
+
     try:
         # Start the game and wait for it to finish
         process = subprocess.Popen(cmd, env=env)
         process.wait()
     except KeyboardInterrupt:
         process.terminate()
-        
+
     end_time = time.time()
     elapsed_seconds = int(end_time - start_time)
-    
+
+    # Crash Catcher logic (if closed under 10 seconds)
+    if elapsed_seconds < 10:
+        redist_folders = [d for d in os.listdir(game_dir) if d.lower() in ["_redist", "redist", "commonredist", "directx", "vcredist", "dxsetup"]]
+
+        crash_msg = f"Game closed unexpectedly after {elapsed_seconds} seconds.\n\n"
+        if redist_folders:
+            crash_msg += "We detected redistributable folders in the game directory:\n"
+            crash_msg += ", ".join(redist_folders) + "\n"
+            crash_msg += "You may need to install these components manually using Protontricks.\n\n"
+
+        crash_msg += "Other common issues:\n- Missing dependencies (VC++)\n- Incorrect Proton version\n- Corrupt crack/fix files."
+
+        if subprocess.run(["which", "zenity"], stdout=subprocess.DEVNULL).returncode == 0:
+            subprocess.run(["zenity", "--warning", "--text", crash_msg, "--title", "Crash Detected - OFME Game Manager"], stderr=subprocess.DEVNULL)
+
     # Save the playtime to Games.ini
     if elapsed_seconds > 0:
         ini_path = os.path.expanduser("~/.config/OFME-Linux/Games.ini")
@@ -395,14 +449,14 @@ def main():
             config.optionxform = str
             try:
                 config.read(ini_path, encoding='utf-8')
-                
+
                 # Find the name of the game (matching executable path)
                 target_section = None
                 for section in config.sections():
                     if config.has_option(section, 'executable') and config.get(section, 'executable') == game_exe:
                         target_section = section
                         break
-                
+
                 if target_section:
                     current_time = 0
                     if config.has_option(target_section, 'timeSpent'):
@@ -410,9 +464,9 @@ def main():
                             current_time = int(config.get(target_section, 'timeSpent'))
                         except ValueError:
                             pass
-                    
+
                     config.set(target_section, 'timeSpent', str(current_time + elapsed_seconds))
-                    
+
                     with open(ini_path, 'w', encoding='utf-8') as f:
                         config.write(f)
                     print(f"Playtime updated: +{elapsed_seconds} seconds.")
