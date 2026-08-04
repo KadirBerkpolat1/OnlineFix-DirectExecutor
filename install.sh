@@ -78,6 +78,17 @@ Categories=Game;
 MimeType=application/x-ms-dos-executable;application/x-executable;
 DESK
 
+cat <<DESK > "$APP_DIR/ofme-gui.desktop"
+[Desktop Entry]
+Name=OFME Game Manager
+Comment=OnlineFix & Hubcap Game Manager
+Exec="$HOME/.local/bin/ofme-gui"
+Icon=$ICON_DIR/onlinefix-logo.png
+Terminal=false
+Type=Application
+Categories=Game;
+DESK
+
     update-desktop-database "$APP_DIR" 2>/dev/null || true
 
     echo "100"; echo "XXX"; echo "Base Installation Complete!"; echo "XXX"

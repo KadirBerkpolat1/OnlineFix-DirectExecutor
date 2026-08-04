@@ -17,6 +17,7 @@ rm -f "$BIN_DIR/ofme-gui"
 rm -f "$BIN_DIR/ofme_hubcap.py"
 rm -f "$BIN_DIR/ofme_autocracker.py"
 rm -f "$APP_DIR/onlinefix-executor.desktop"
+rm -f "$APP_DIR/ofme-gui.desktop"
 rm -f "$ICON_DIR/onlinefix-logo.png"
 
 echo ""
