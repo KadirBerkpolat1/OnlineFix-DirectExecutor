@@ -13,6 +13,7 @@ ICON_DIR="$HOME/.local/share/icons/hicolor/256x256/apps"
 
 echo "[1/3] Removing Direct Executor files..."
 rm -f "$BIN_DIR/onlinefix-executor"
+rm -f "$BIN_DIR/ofme-gui"
 rm -f "$APP_DIR/onlinefix-executor.desktop"
 rm -f "$ICON_DIR/onlinefix-logo.png"
 

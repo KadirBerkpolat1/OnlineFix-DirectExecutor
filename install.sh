@@ -56,6 +56,8 @@ whiptail --title "$TITLE" --msgbox "Welcome to the OnlineFix Direct Executor & G
     # Step 2: Download Executor
     echo "70"; echo "XXX"; echo "Downloading Execution Engine (onlinefix-executor)..."; echo "XXX"
     curl -sSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/onlinefix-executor.py -o "$BIN_DIR/onlinefix-executor"
+    curl -sSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/ofme-gui.py -o "$BIN_DIR/ofme-gui"
+    chmod +x "$BIN_DIR/ofme-gui"
     chmod +x "$BIN_DIR/onlinefix-executor"
 
     # Step 3: Download Icons & Desktop Entry
