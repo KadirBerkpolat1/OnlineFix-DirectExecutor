@@ -96,7 +96,7 @@ Before using the executor, make sure the following packages are installed on you
 - `zenity` or `kdialog` (Required) – For download progress bars and notifications.
 - `icoutils` & `imagemagick` (Optional) – For automatic, high-quality icon extraction from Windows `.exe` files (a more universal alternative to `icoextract`).
 
-> **‼️ IMPORTANT NOTE:** Unlike the official *OnlineFix Linux Launcher*, **our Direct Executor 100% supports Flatpak Steam versions!** Our smart engine automatically detects and adapts to your paths whether you installed Steam natively or via Flatpak (`com.valvesoftware.Steam`). However, Snap versions are currently not supported.
+> **‼️ IMPORTANT NOTE:** **Our Direct Executor 100% supports Flatpak Steam versions!** Our smart engine automatically detects and adapts to your paths whether you installed Steam natively or via Flatpak (`com.valvesoftware.Steam`). However, Snap versions are currently not supported.
 
 ## 🧩 Compatibility Matrix
 

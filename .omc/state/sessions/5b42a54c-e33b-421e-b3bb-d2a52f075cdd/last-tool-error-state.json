@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"ls -ld ~/.local/share/Steam/compatibilitytools.d/*\\nls -ld ~/.config/OFME-Linux/protons/*\"}",
+  "error": "Exit code 1\ndrwxr-xr-x 1 sonic sonic 370 Ağu  3 20:43 /home/sonic/.local/share/Steam/compatibilitytools.d/GE-Proton11-3\ndrwxr-xr-x 1 sonic sonic 328 Ağu  3 20:22 /home/sonic/.local/share/Steam/compatibilitytools.d/UMU-Proton-10.0-4\n(eval):2: no matches found: /home/sonic/.config/OFME-Linux/protons/*",
+  "timestamp": "2026-08-03T20:25:26.207Z",
+  "retry_count": 1
+}

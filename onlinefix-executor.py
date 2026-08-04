@@ -138,6 +138,34 @@ def get_active_steam_path():
             return p
     return os.path.expanduser("~/.steam/steam")
 
+def fetch_steam_metadata(game_dir_name):
+    # Klasör adını temizle (Korsan/Repack etiketlerini sil)
+    clean_name = re.sub(r'(?i)(\b(repack|v\d+.*|onlinefix|portable|crack|build|update|by|fitgirl|dodi|multi\d+)\b|[\[\(\{].*?[\]\)\}])', '', game_dir_name)
+    clean_name = clean_name.replace('_', ' ').replace('.', ' ').strip()
+
+    if not clean_name:
+        return game_dir_name, None
+
+    # Steam Store API araması
+    try:
+        import urllib.parse
+        query = urllib.parse.quote(clean_name)
+        url = f"https://store.steampowered.com/api/storesearch/?term={query}&l=english&cc=US"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+
+        with urllib.request.urlopen(req, timeout=3) as response:
+            data = json.loads(response.read().decode())
+            if data.get('total', 0) > 0:
+                first_hit = data['items'][0]
+                real_name = first_hit.get('name', game_dir_name)
+                real_id = first_hit.get('id')
+                # Check for trademark/copyright symbols and clean them
+                real_name = real_name.replace('™', '').replace('®', '')
+                return real_name, real_id
+    except Exception:
+        pass
+    return game_dir_name, None
+
 def add_to_ofme_launcher(game_exe, game_dir, prefix_path, custom_overrides, fake_app_id, proton_bin_path):
     ini_path = os.path.expanduser("~/.config/OFME-Linux/Games.ini")
     os.makedirs(os.path.dirname(ini_path), exist_ok=True)
@@ -151,7 +179,9 @@ def add_to_ofme_launcher(game_exe, game_dir, prefix_path, custom_overrides, fake
         except:
             pass
 
-    game_name = os.path.basename(game_dir)
+    folder_name = os.path.basename(game_dir)
+    real_name, real_id = fetch_steam_metadata(folder_name)
+    game_name = real_name if real_name else folder_name
     if not game_name:
         game_name = "Unknown Game"
 
@@ -193,7 +223,18 @@ def add_to_ofme_launcher(game_exe, game_dir, prefix_path, custom_overrides, fake
     
     icon_path = os.path.join(images_dir, f"{game_name}_icon.png")
     header_path = os.path.join(images_dir, f"{game_name}_header.png")
-    
+
+    # Steam CDN'den Orijinal Kapak Resmini İndir
+    if real_id and not os.path.exists(header_path):
+        header_url = f"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{real_id}/header.jpg"
+        try:
+            req = urllib.request.Request(header_url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=5) as response:
+                with open(header_path, 'wb') as f:
+                    f.write(response.read())
+        except Exception:
+            pass
+
     if not os.path.exists(icon_path):
         import subprocess
         try:
@@ -226,7 +267,7 @@ def main():
         print(f"Error: File not found -> {game_exe}")
         sys.exit(1)
 
-    dx_overrides = "d3d11=n;d3d10=n;d3d10core=n;dxgi=n;openvr_api_dxvk=n;d3d12=n;d3d12core=n;d3d9=n;d3d8=n;"
+    dx_overrides = "d3d11=n;d3d10=n;d3d10core=n;dxgi=n;openvr_api_dxvk=n;d3d12=n;d3d12core=n;d3d9=n;d3d8=n;winedbg.exe=d;"
     overrides = []
 
     dll_pattern = re.compile(r'(?i)^(emp|custom)\.dll$|^win.*\.dll$|^(online|steam).*\.(dll|ini|json)$|^eos.*\.dll$|^epicfix.*\.dll$|^(winmm|dlllist)\.txt$|^launch_data\.of.*$')
@@ -312,6 +353,7 @@ def main():
 
     env = os.environ.copy()
     env["WINEDLLOVERRIDES"] = final_overrides
+    env["WINEDEBUG"] = "-all"
     env["STEAM_COMPAT_DATA_PATH"] = prefix_path
     env["STEAM_COMPAT_CLIENT_INSTALL_PATH"] = steam_path
 
