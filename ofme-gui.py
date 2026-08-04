@@ -4,12 +4,35 @@ import sys
 import subprocess
 import configparser
 import json
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
+from PyQt5.QtWidgets import (QInputDialog, QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QGridLayout, QLabel, QPushButton,
                              QScrollArea, QDialog, QLineEdit, QCheckBox,
                              QComboBox, QFileDialog, QMessageBox, QTabWidget, QFormLayout)
 from PyQt5.QtGui import QPixmap, QIcon, QFont, QPalette, QColor
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt, QSize, QThread, pyqtSignal
+from ofme_hubcap import HubcapManager
+from ofme_autocracker import AutoCracker
+
+
+
+class WorkerThread(QThread):
+    progress = pyqtSignal(int, str)
+    finished = pyqtSignal(bool, str)
+
+    def __init__(self, task_func, *args, **kwargs):
+        super().__init__()
+        self.task_func = task_func
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self):
+        try:
+            # We pass the progress signal emit function as a callback
+            self.kwargs['progress_callback'] = self.progress.emit
+            res = self.task_func(*self.args, **self.kwargs)
+            self.finished.emit(True, "Success")
+        except Exception as e:
+            self.finished.emit(False, str(e))
 
 CONFIG_DIR = os.path.expanduser("~/.config/OFME-Linux")
 GAMES_INI = os.path.join(CONFIG_DIR, "Games.ini")
@@ -257,7 +280,6 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(scroll, "My Library")
 
     def init_hubcap_tab(self):
-        # Placeholder for Hubcap / enter-the-wired integration
         widget = QWidget()
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignTop)
@@ -277,18 +299,93 @@ class MainWindow(QMainWindow):
         layout.addLayout(form)
 
         btn_box = QHBoxLayout()
-        btn_search = QPushButton("Search Games (Coming Soon)")
-        btn_search.setDisabled(True)
+        btn_search = QPushButton("Search Hubcap & Unlock")
+        btn_search.clicked.connect(self.search_hubcap)
         btn_box.addWidget(btn_search)
 
-        btn_fix = QPushButton("Auto-find Fix for Existing Game")
-        btn_fix.clicked.connect(self.auto_fix_placeholder)
+        btn_install_hook = QPushButton("Install Steam Hook (SLSteam)")
+        btn_install_hook.clicked.connect(self.install_steam_hook)
+        btn_box.addWidget(btn_install_hook)
+
+        btn_fix = QPushButton("Auto-find Fix for Game")
+        btn_fix.clicked.connect(self.auto_fix_game)
         btn_box.addWidget(btn_fix)
 
         layout.addLayout(btn_box)
+        
+        self.lbl_status = QLabel("Status: Idle")
+        self.lbl_status.setStyleSheet("color: #27ae60; font-weight: bold; margin-top: 20px;")
+        layout.addWidget(self.lbl_status)
+        
         widget.setLayout(layout)
-
         self.tabs.addTab(widget, "Discover & Unlock")
+
+    def search_hubcap(self):
+        api_key = self.api_input.text().strip()
+        if not api_key:
+            QMessageBox.warning(self, "Warning", "Please enter a Hubcap API Key.")
+            return
+            
+        query, ok = QInputDialog.getText(self, "Search Game", "Enter game name to search:")
+        if not ok or not query.strip():
+            return
+            
+        self.lbl_status.setText(f"Status: Searching games for '{query}'...")
+        self.hubcap = HubcapManager(api_key)
+        try:
+            games = self.hubcap.search_game(query.strip())
+            # For mockup, we just take the first one
+            selected = games[0]
+            
+            self.lbl_status.setText(f"Status: Downloading manifest for {selected['name']}...")
+            
+            self.thread = WorkerThread(self.hubcap.download_manifests, selected['app_id'])
+            self.thread.progress.connect(self.update_status)
+            self.thread.finished.connect(self.task_finished)
+            self.thread.start()
+        except Exception as e:
+            QMessageBox.critical(self, "Error", str(e))
+            self.lbl_status.setText("Status: Error")
+
+    def install_steam_hook(self):
+        self.lbl_status.setText("Status: Installing enter-the-wired hook...")
+        self.hubcap = HubcapManager()
+        self.thread = WorkerThread(self.hubcap.install_enter_the_wired)
+        self.thread.progress.connect(self.update_status)
+        self.thread.finished.connect(self.task_finished)
+        self.thread.start()
+
+    def auto_fix_game(self):
+        game_dir = QFileDialog.getExistingDirectory(self, "Select Game Directory to Crack")
+        if not game_dir:
+            return
+            
+        self.lbl_status.setText(f"Status: Searching fix for game...")
+        self.autocrack = AutoCracker()
+        try:
+            # Mock find
+            results = self.autocrack.search_fix("Selected Game")
+            fix_url = results[0]['download_url']
+            
+            self.lbl_status.setText(f"Status: Downloading and applying fix...")
+            self.thread = WorkerThread(self.autocrack.download_and_apply, fix_url, game_dir)
+            self.thread.progress.connect(self.update_status)
+            self.thread.finished.connect(self.task_finished)
+            self.thread.start()
+        except Exception as e:
+            QMessageBox.critical(self, "Error", str(e))
+            self.lbl_status.setText("Status: Error")
+
+    def update_status(self, percent, message):
+        self.lbl_status.setText(f"Status: {message} ({percent}%)")
+
+    def task_finished(self, success, message):
+        if success:
+            QMessageBox.information(self, "Success", "Operation completed successfully!")
+            self.lbl_status.setText("Status: Idle")
+        else:
+            QMessageBox.critical(self, "Error", f"Operation failed: {message}")
+            self.lbl_status.setText("Status: Error")
 
     def load_games(self):
         # Clear grid
@@ -326,8 +423,7 @@ class MainWindow(QMainWindow):
                     col = 0
                     row += 1
 
-    def auto_fix_placeholder(self):
-        QMessageBox.information(self, "Auto-Cracker", "The Auto-Cracker engine will scan your selected folder and download the corresponding OnlineFix files via Torrent/Direct automatically in a future update.")
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

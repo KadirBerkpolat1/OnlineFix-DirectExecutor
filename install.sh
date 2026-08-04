@@ -57,6 +57,8 @@ whiptail --title "$TITLE" --msgbox "Welcome to the OnlineFix Direct Executor & G
     echo "70"; echo "XXX"; echo "Downloading Execution Engine (onlinefix-executor)..."; echo "XXX"
     curl -sSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/onlinefix-executor.py -o "$BIN_DIR/onlinefix-executor"
     curl -sSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/ofme-gui.py -o "$BIN_DIR/ofme-gui"
+    curl -sSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/ofme_hubcap.py -o "$BIN_DIR/ofme_hubcap.py"
+    curl -sSL https://raw.githubusercontent.com/KadirBerkpolat1/OnlineFix-DirectExecutor/main/ofme_autocracker.py -o "$BIN_DIR/ofme_autocracker.py"
     chmod +x "$BIN_DIR/ofme-gui"
     chmod +x "$BIN_DIR/onlinefix-executor"
 
