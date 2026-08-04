@@ -34,13 +34,13 @@ whiptail --title "$TITLE" --msgbox "Welcome to the OnlineFix Direct Executor & G
         echo "30"; echo "XXX"; echo "Installing dependencies (icoutils, imagemagick, zenity, aria2)..."; echo "XXX"
 
         if [ -f /etc/arch-release ]; then
-            sudo pacman -S --noconfirm --needed icoutils imagemagick zenity aria2 > /dev/null 2>&1 || true
+            sudo pacman -S --noconfirm --needed icoutils imagemagick zenity aria2 python-pyqt5 > /dev/null 2>&1 || true
         elif [ -f /etc/debian_version ]; then
-            sudo apt-get update > /dev/null 2>&1 && sudo apt-get install -y icoutils imagemagick zenity aria2 > /dev/null 2>&1 || true
+            sudo apt-get update > /dev/null 2>&1 && sudo apt-get install -y icoutils imagemagick zenity aria2 python3-pyqt5 > /dev/null 2>&1 || true
         elif [ -f /etc/fedora-release ]; then
-            sudo dnf install -y icoutils ImageMagick zenity aria2 > /dev/null 2>&1 || true
+            sudo dnf install -y icoutils ImageMagick zenity aria2 python3-pyqt5 > /dev/null 2>&1 || true
         elif [ -f /etc/SUSE-brand ] || [ -f /etc/SuSE-release ]; then
-            sudo zypper install -y icoutils ImageMagick zenity aria2 > /dev/null 2>&1 || true
+            sudo zypper install -y icoutils ImageMagick zenity aria2 python3-qt5 > /dev/null 2>&1 || true
         fi
     fi
     echo "50"; echo "XXX"; echo "Dependencies verified."; echo "XXX"
